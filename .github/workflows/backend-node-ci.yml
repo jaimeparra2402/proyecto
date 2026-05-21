@@ -1,0 +1,37 @@
+name: Backend Node.js CI
+
+# El pipeline se dispara solo bajo estas condiciones
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend-node/**' # <-- SÓLO se activa si cambia algo dentro de esta carpeta
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend-node/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'backend-node/package-lock.json'
+
+    - name: Instalar dependencias
+      run: |
+        cd backend-node
+        npm ci
+
+    - name: Verificación de estructura
+      run: |
+        cd backend-node
+        node --check server.js
