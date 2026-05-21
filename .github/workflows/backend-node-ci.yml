@@ -1,22 +1,25 @@
-name: Backend Node.js CI
+name: Backend Node.js CI/CD
 
-# El pipeline se dispara solo bajo estas condiciones
 on:
   push:
     branches: [ main ]
     paths:
-      - 'backend-node/**' # <-- SÓLO se activa si cambia algo dentro de esta carpeta
+      - 'backend-node/**'
   pull_request:
     branches: [ main ]
     paths:
       - 'backend-node/**'
 
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: backend-node
+  REGION: europe-west1
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout del código
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Configurar Node.js
@@ -26,12 +29,45 @@ jobs:
         cache: 'npm'
         cache-dependency-path: 'backend-node/package-lock.json'
 
-    - name: Instalar dependencias
+    - name: Install dependencies
       run: |
         cd backend-node
         npm ci
 
-    - name: Verificación de estructura
+    - name: Verify code structure
       run: |
         cd backend-node
         node --check server.js
+
+  deploy-to-gcp:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Google Auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker for GCP
+      run: gcloud auth configure-docker --quiet
+
+    - name: Build and Push Container
+      run: |
+        cd backend-node
+        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated
