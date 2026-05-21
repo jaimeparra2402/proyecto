@@ -1,0 +1,42 @@
+# Carpetas de dependencias comunes
+node_modules/
+dist/
+.sourcemaps/
+.pnpm-store/
+
+# Java y Maven (DWSC)
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+.gradle/
+build/
+
+# Entornos y secretos
+.env
+.env.local
+.env.*.local
+
+# IDEs y editores
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Sistemas operativos
+.DS_Store
+Thumbs.db
+
+# Configuración local de Ionic / Android (DAH)
+.sourcemaps
+.ionic
+www
+platforms/
+plugins/
+android/app/build
+*.apk
