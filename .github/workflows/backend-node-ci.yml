@@ -11,7 +11,7 @@ on:
       - 'backend-node/**'
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: cc-25-26
   SERVICE_NAME: backend-node
   REGION: europe-west1
 
@@ -43,6 +43,9 @@ jobs:
     needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
