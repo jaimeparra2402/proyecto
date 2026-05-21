@@ -4,6 +4,8 @@ const connectDB = require('./api_server/models/db');
 const apiPlayerRoutes = require('./api_server/routes/playerRoutes');
 const apiUserRoutes = require('./api_server/routes/userRoutes');
 const apiExternalRoutes = require('./api_server/routes/externalRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./api_server/models/swaggerSpec');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +17,7 @@ connectDB();
 app.use('/api/users', apiUserRoutes);
 app.use('/api/players', apiPlayerRoutes);
 app.use('/api/external', apiExternalRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: "online" });
