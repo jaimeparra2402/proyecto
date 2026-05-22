@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - 'backend-java/**'
+      - 'comments-service/**'
+      - 'eureka-server/**'
+      - 'config-server/**'
 
 jobs:
   build:
@@ -31,17 +34,15 @@ jobs:
         docker build -t gcr.io/cc-25-26/backend-java ./backend-java
         docker push gcr.io/cc-25-26/backend-java
 
-    - name: Debug env vars
-      run: |
-        echo "DB_URL is set: ${{ secrets.DB_URL != '' }}"
-        echo "DB_USER is set: ${{ secrets.DB_USER != '' }}"
-        echo "DB_PASS is set: ${{ secrets.DB_PASS != '' }}"
-
     - name: Deploy to Cloud Run
+      env:
+        DB_URL: ${{ secrets.DB_URL }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASS: ${{ secrets.DB_PASS }}
       run: |
         gcloud run deploy backend-java \
           --image gcr.io/cc-25-26/backend-java \
           --platform managed \
           --region europe-west1 \
           --allow-unauthenticated \
-          --set-env-vars DB_URL="${{ secrets.DB_URL }}",DB_USER="${{ secrets.DB_USER }}",DB_PASS="${{ secrets.DB_PASS }}"
+          --set-env-vars "DB_URL=$DB_URL,DB_USER=$DB_USER,DB_PASS=$DB_PASS"
