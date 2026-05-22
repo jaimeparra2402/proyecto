@@ -1,5 +1,14 @@
+const admin = require('firebase-admin');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+
+
+if (!admin.apps.length && process.env.FIREBASE_CONFIG_PATH) {
+  const serviceAccount = require(process.env.FIREBASE_CONFIG_PATH);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+}
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '24h' });
@@ -42,6 +51,21 @@ exports.protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ status: 'fail', message: 'Not logged in' });
     }
+
+
+    if (admin.apps.length) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = {
+          id: decodedToken.uid,
+          username: decodedToken.email || decodedToken.name,
+          role: decodedToken.role || 'user' 
+        };
+        return next();
+      } catch (fbError) {
+      }
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
@@ -49,8 +73,9 @@ exports.protect = async (req, res, next) => {
     }
     req.user = currentUser;
     next();
+
   } catch (error) {
-    res.status(401).json({ status: 'error', message: 'Invalid token' });
+    res.status(401).json({ status: 'error', message: 'Invalid or expired token' });
   }
 };
 
