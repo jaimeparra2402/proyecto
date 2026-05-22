@@ -6,9 +6,7 @@ on:
       - main
     paths:
       - 'backend-java/**'
-      - 'comments-service/**'
-      - 'eureka-server/**'
-      - 'config-server/**'
+
 
 jobs:
   build:
