@@ -8,19 +8,12 @@ on:
       - 'backend-java/**'
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'maven'
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v1
@@ -31,8 +24,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
 
     - name: Configure Docker for GCP
-      run: |
-        gcloud auth configure-docker --quiet
+      run: gcloud auth configure-docker --quiet
 
     - name: Build and Push Docker Image
       run: |
@@ -46,4 +38,4 @@ jobs:
           --platform managed \
           --region europe-west1 \
           --allow-unauthenticated \
-          --set-env-vars MONGO_URI="${{ secrets.MONGO_URI }}"
+          --set-env-vars DB_URL="${{ secrets.DB_URL }}",DB_USER="${{ secrets.DB_USER }}",DB_PASS="${{ secrets.DB_PASS }}"
