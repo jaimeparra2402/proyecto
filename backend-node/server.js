@@ -5,7 +5,8 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const playerRoutes = require('./api_server/routes/playerRoutes'); 
 const errorHandler = require('./api_server/middleware/errorHandler');
-require('./api_server/models/db');
+const connectDB = require('./api_server/models/db');
+connectDB();
 
 const app = express();
 
