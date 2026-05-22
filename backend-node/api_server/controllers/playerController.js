@@ -7,6 +7,7 @@ exports.getPlayers = async (req, res) => {
     if (name) query.name = { $regex: name, $options: 'i' };
     if (teamLeague) query.teamLeague = { $regex: teamLeague, $options: 'i' };
     if (startDate) query.createdAt = { $gte: new Date(startDate) };
+    
     const players = await Player.find(query);
     res.status(200).json({ status: 'success', data: players });
   } catch (error) {
@@ -27,7 +28,7 @@ exports.getPlayerById = async (req, res) => {
 exports.createPlayer = async (req, res) => {
   try {
     const { name, teamLeague, imageUrl, latitude, longitude } = req.body;
-    if (!name || !teamLeague || !imageUrl || !latitude || !longitude) {
+    if (!name || !teamLeague || !imageUrl || latitude === undefined || longitude === undefined) {
       return res.status(400).json({ status: 'fail', message: 'Missing fields' });
     }
     const newPlayer = new Player({
@@ -47,7 +48,7 @@ exports.updatePlayer = async (req, res) => {
   try {
     const { name, teamLeague, imageUrl, latitude, longitude } = req.body;
     let updateData = { name, teamLeague, imageUrl };
-    if (latitude && longitude) {
+    if (latitude !== undefined && longitude !== undefined) {
       updateData.location = { type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] };
     }
     const player = await Player.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
@@ -70,14 +71,26 @@ exports.deletePlayer = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-    const { author, comment, rating } = req.body;
+    const { author, comment, rating, latitude, longitude } = req.body;
+    
+    if (!author || !comment || rating === undefined || latitude === undefined || longitude === undefined) {
+      return res.status(400).json({ status: 'fail', message: 'Missing fields for comment' });
+    }
+
     const player = await Player.findById(req.params.playerId);
     if (!player) return res.status(404).json({ status: 'fail', message: 'Not found' });
-    player.comments.push({ author, comment, rating });
+    
+    player.comments.push({ 
+      author, 
+      comment, 
+      rating: Number(rating),
+      location: { lat: parseFloat(latitude), lng: parseFloat(longitude) }
+    });
+    
     await player.save();
     res.status(201).json({ status: 'success', data: player.comments });
   } catch (error) {
-    res.status(400).json({ status: 'error', message: error.message });
+    res.status(500).json({ status: 'error', message: error.message });
   }
 };
 
@@ -86,8 +99,10 @@ exports.deleteComment = async (req, res) => {
     const { playerId, commentId } = req.params;
     const player = await Player.findById(playerId);
     if (!player) return res.status(404).json({ status: 'fail', message: 'Not found' });
+    
     const comment = player.comments.id(commentId);
     if (!comment) return res.status(404).json({ status: 'fail', message: 'Not found' });
+    
     comment.deleteOne();
     await player.save();
     res.status(200).json({ status: 'success', message: 'Deleted' });

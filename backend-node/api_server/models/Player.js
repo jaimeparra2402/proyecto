@@ -4,6 +4,10 @@ const CommentSchema = new mongoose.Schema({
   author: { type: String, required: true },
   comment: { type: String, required: true, maxlength: 1000 },
   rating: { type: Number, required: true, min: 0, max: 5 },
+  location: {
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true }
+  },
   createdAt: { type: Date, default: Date.now }
 });
 
