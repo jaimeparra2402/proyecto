@@ -7,12 +7,6 @@ on:
     paths:
       - 'backend-java/**'
 
-env:
-  PROJECT_ID: cc-25-26
-  REGION: europe-west1
-  SERVICE_NAME: backend-java-service
-  IMAGE_NAME: gcr.io/cc-25-26/backend-java
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -42,14 +36,14 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t $IMAGE_NAME ./backend-java
-        docker push $IMAGE_NAME
+        docker build -t gcr.io/cc-25-26/backend-java ./backend-java
+        docker push gcr.io/cc-25-26/backend-java
 
     - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy $SERVICE_NAME \
-          --image $IMAGE_NAME \
+        gcloud run deploy backend-java \
+          --image gcr.io/cc-25-26/backend-java \
           --platform managed \
-          --region $REGION \
+          --region europe-west1 \
           --allow-unauthenticated \
           --set-env-vars MONGO_URI="${{ secrets.MONGO_URI }}"
