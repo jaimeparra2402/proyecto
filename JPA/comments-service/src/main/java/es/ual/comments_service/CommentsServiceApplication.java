@@ -9,7 +9,6 @@ public class CommentsServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CommentsServiceApplication.class, args);
-
 	}
 
 }
