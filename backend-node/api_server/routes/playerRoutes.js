@@ -3,19 +3,18 @@ const router = express.Router();
 const playerController = require('../controllers/playerController');
 const authController = require('../controllers/authController');
 
-router.route('/')
-  .get(playerController.getPlayers)
-  .post(authController.protect, playerController.createPlayer);
+router.get('/', playerController.getPlayers);
+router.get('/:id', playerController.getPlayerById);
 
-router.route('/:id')
-  .get(playerController.getPlayerById)
-  .put(authController.protect, authController.restrictTo('admin'), playerController.updatePlayer)
-  .delete(authController.protect, authController.restrictTo('admin'), playerController.deletePlayer);
+router.use(authController.protect);
 
-router.route('/:playerId/comments')
-  .post(authController.protect, playerController.addComment);
+router.post('/:playerId/comments', playerController.addComment);
 
-router.route('/:playerId/comments/:commentId')
-  .delete(authController.protect, authController.restrictTo('admin'), playerController.deleteComment);
+router.use(authController.restrictTo('admin'));
+
+router.post('/', playerController.createPlayer);
+router.put('/:id', playerController.updatePlayer);
+router.delete('/:id', playerController.deletePlayer);
+router.delete('/:playerId/comments/:commentId', playerController.deleteComment);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const swaggerSpec = {
   openapi: '3.0.0',
   info: {
-    title: 'API de Fútbol Proyecto cc-25-26',
+    title: 'Proyecto Comun',
     version: '1.0.0',
     description: 'Documentación interactiva de la API para la gestión de jugadores y usuarios.'
   },
