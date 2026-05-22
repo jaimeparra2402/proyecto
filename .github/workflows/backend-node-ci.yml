@@ -79,4 +79,4 @@ jobs:
           --platform managed \
           --region $REGION \
           --allow-unauthenticated \
-          --port 3000
+          --set-env-vars MONGO_URI="${{ secrets.MONGO_URI }}"
