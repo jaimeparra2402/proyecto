@@ -1,4 +1,4 @@
-name: Deploy Spring Boot to Cloud Run
+name: Backend Java CI/CD
 
 on:
   push:
@@ -8,10 +8,10 @@ on:
       - 'backend-java/**'
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: cc-25-26
   REGION: europe-west1
   SERVICE_NAME: backend-java-service
-  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-java
+  IMAGE_NAME: gcr.io/cc-25-26/backend-java
 
 jobs:
   deploy:
