@@ -79,4 +79,5 @@ jobs:
           --platform managed \
           --region $REGION \
           --allow-unauthenticated \
-          --set-env-vars MONGO_URI="${{ secrets.MONGO_URI }}"
+          --port 8080 \
+          --set-env-vars MONGO_URI="${{ secrets.MONGO_URI }}",PORT=8080
