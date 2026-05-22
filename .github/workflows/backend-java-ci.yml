@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'backend-java/**'
+      - 'JPA/**'
 
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t gcr.io/cc-25-26/backend-java ./backend-java
+        docker build -t gcr.io/cc-25-26/backend-java ./JPA/backend-java
         docker push gcr.io/cc-25-26/backend-java
 
     - name: Deploy to Cloud Run
