@@ -31,6 +31,12 @@ jobs:
         docker build -t gcr.io/cc-25-26/backend-java ./backend-java
         docker push gcr.io/cc-25-26/backend-java
 
+    - name: Debug env vars
+      run: |
+        echo "DB_URL is set: ${{ secrets.DB_URL != '' }}"
+        echo "DB_USER is set: ${{ secrets.DB_USER != '' }}"
+        echo "DB_PASS is set: ${{ secrets.DB_PASS != '' }}"
+
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy backend-java \
