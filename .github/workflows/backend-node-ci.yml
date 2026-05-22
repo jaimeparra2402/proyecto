@@ -80,4 +80,4 @@ jobs:
           --region $REGION \
           --allow-unauthenticated \
           --port 8080 \
-          --set-env-vars MONGO_URI="${{ secrets.MONGO_URI }}"
+          --timeout 300

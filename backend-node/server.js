@@ -5,14 +5,11 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const playerRoutes = require('./api_server/routes/playerRoutes');
 const errorHandler = require('./api_server/middleware/errorHandler');
-const connectDB = require('./api_server/models/db');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-connectDB();
 
 const swaggerOptions = {
   definition: {
@@ -24,7 +21,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3000}`,
+        url: process.env.SERVER_URL || `http://localhost:${process.env.PORT || 8080}`,
       },
     ],
   },
@@ -32,19 +29,24 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
+
 app.use('/swagger-ui', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'success', ok: true, message: 'API Server Online' });
+  res.status(200).json({
+    status: 'success',
+    ok: true,
+    message: 'API Server Online',
+  });
 });
 
-app.use('/api/players', playerRoutes);
+// Si estas rutas usan DB y fallan, puedes comentarlas por ahora
+// app.use('/api/players', playerRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
     status: 'fail',
     error: 'Route not found',
-    message: `La ruta ${req.originalUrl} no está definida en este servidor.`
   });
 });
 
@@ -53,7 +55,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;
