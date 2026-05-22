@@ -1,20 +1,6 @@
 const express = require('express');
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
-
-const swaggerSpec = swaggerJsdoc({
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Football Players API',
-      version: '1.0.0',
-      description: 'API documentation'
-    }
-  },
-  apis: []
-});
 
 app.get('/', (req, res) => {
   res.send('OK');
@@ -24,8 +10,26 @@ app.get('/health', (req, res) => {
   res.status(200).json({ ok: true });
 });
 
-// Swagger
-app.use('/swagger-ui', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+try {
+  const swaggerUi = require('swagger-ui-express');
+  const swaggerJsdoc = require('swagger-jsdoc');
+
+  const swaggerSpec = swaggerJsdoc({
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Football Players API',
+        version: '1.0.0'
+      }
+    },
+    apis: []
+  });
+
+  app.use('/swagger-ui', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  console.log('Swagger loaded');
+} catch (err) {
+  console.error('Swagger failed:', err.message);
+}
 
 const PORT = process.env.PORT || 8080;
 
