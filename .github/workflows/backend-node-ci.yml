@@ -34,6 +34,11 @@ jobs:
         cd backend-node
         npm ci
 
+    - name: Run Unit Tests
+      run: |
+        cd backend-node
+        npm test
+
     - name: Verify code structure
       run: |
         cd backend-node
