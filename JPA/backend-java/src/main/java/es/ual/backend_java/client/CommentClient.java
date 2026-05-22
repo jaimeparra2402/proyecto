@@ -11,4 +11,5 @@ public interface CommentClient {
 
     @GetMapping("/api/comments/player/{playerId}")
     List<Map<String, Object>> getCommentsByPlayer(@PathVariable Long playerId);
+    
 }
