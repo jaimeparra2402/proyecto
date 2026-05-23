@@ -8,9 +8,10 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { filter, calendarOutline } from 'ionicons/icons';
-import { ApiToggleComponent } from '../../shared/components/api-toggle/api-toggle.component';
-import { PlayerFactoryService } from '../../services/player-factory.service';
-import { BackendToggleService } from '../../services/backend-toggle.service';
+
+import { ApiToggleComponent } from '../../shared/api-toggle/api-toggle.component';
+import { PlayerFactoryService } from '../../core/services/player-factory.service';
+import { BackendToggleService } from '../../core/services/backend-toggle.service';
 
 @Component({
   selector: 'app-home',
@@ -29,7 +30,6 @@ import { BackendToggleService } from '../../services/backend-toggle.service';
 export class HomePage implements OnInit {
   players: any[] = [];
   
-  // Modelos para los filtros de búsqueda
   searchName: string = '';
   searchTeam: string = '';
   searchDate: string = '';
@@ -57,8 +57,8 @@ export class HomePage implements OnInit {
       next: (response: any) => {
         this.players = response.data ? response.data : response;
       },
-      error: (err) => {
-        console.error('Error cargando jugadores desde el backend activo:', err);
+      error: (err: any) => {
+        console.error('Error:', err);
         this.players = [];
       }
     });
@@ -69,8 +69,10 @@ export class HomePage implements OnInit {
   }
 
   onDateChange(event: any) {
-    this.searchDate = event.detail.value.split('T')[0]; 
-    this.loadPlayers();
+    if (event.detail.value) {
+      this.searchDate = event.detail.value.split('T')[0];
+      this.loadPlayers();
+    }
   }
 
   clearFilters() {

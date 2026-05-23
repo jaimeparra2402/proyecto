@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
   IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
   IonAvatar, IonItem, IonLabel, IonList, IonListHeader, IonRow, IonCol, IonIcon
 } from '@ionic/angular/standalone';
-import { PlayerFactoryService } from '../../services/player-factory.service';
+
+import { PlayerFactoryService } from '../../core/services/player-factory.service';
 
 @Component({
   selector: 'app-player-detail',
@@ -39,7 +40,7 @@ export class PlayerDetailPage implements OnInit {
       next: (response: any) => {
         this.player = response.data ? response.data : response;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(err);
       }
     });
