@@ -1,0 +1,4 @@
+<ion-item lines="none">
+  <ion-label>Backend: <b>{{ current }}</b></ion-label>
+  <ion-toggle (ionChange)="onToggleChange($event)" [checked]="current === 'JAVA'"></ion-toggle>
+</ion-item>

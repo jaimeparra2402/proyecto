@@ -1,0 +1,64 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Fútbol Pro Manager</ion-title>
+    <ion-buttons slot="end">
+      <app-api-toggle></app-api-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  
+  <div class="filter-container" style="padding: 10px; background: #f4f5f8;">
+    <ion-searchbar 
+      [(ngModel)]="searchName" 
+      (ionInput)="onSearchChange()" 
+      placeholder="Buscar por nombre...">
+    </ion-searchbar>
+
+    <ion-searchbar 
+      [(ngModel)]="searchTeam" 
+      (ionInput)="onSearchChange()" 
+      placeholder="Buscar por equipo o liga..." 
+      color="light">
+    </ion-searchbar>
+
+    <ion-item lines="none" style="--background: transparent;">
+      <ion-label color="medium"><ion-icon name="calendar-outline"></ion-icon> Fecha de alta:</ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+      
+      <ion-button fill="clear" color="danger" (click)="clearFilters()" *ngIf="searchName || searchTeam || searchDate">
+        Limpiar
+      </ion-button>
+    </ion-item>
+
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime 
+          id="datetime" 
+          presentation="date" 
+          (ionChange)="onDateChange($event)">
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+  </div>
+
+  <ion-list *ngIf="players.length > 0; else noPlayers">
+    <ion-item *ngFor="let player of players" [button]="true" detail="true">
+      <ion-avatar slot="start">
+        <img [src]="player.imageUrl || 'assets/placeholder-player.png'" alt="Foto jugador" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ player.name }}</h2>
+        <p>{{ player.teamLeague }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noPlayers>
+    <div style="text-align: center; margin-top: 40px; color: #888;">
+      <p>No se encontraron jugadores con los filtros aplicados.</p>
+    </div>
+  </ng-template>
+
+</ion-content>
