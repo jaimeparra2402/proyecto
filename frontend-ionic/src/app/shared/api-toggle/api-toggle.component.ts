@@ -6,7 +6,6 @@ import { BackendToggleService, BackendType } from '../../core/services/backend-t
 @Component({
   selector: 'app-api-toggle',
   templateUrl: './api-toggle.component.html',
-  styleUrls: ['./api-toggle.component.scss'],
   standalone: true,
   imports: [CommonModule, IonItem, IonLabel, IonToggle] 
 })
