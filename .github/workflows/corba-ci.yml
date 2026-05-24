@@ -1,12 +1,12 @@
 name: CI/CD Corba Backend
 
+
 on:
-  on:
   push:
     branches:
       - main
     paths:
-      - 'JPA/backend-java/**'
+      - 'JPA/corba/**'
 
 jobs:
   deploy:

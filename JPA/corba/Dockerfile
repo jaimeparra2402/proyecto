@@ -13,6 +13,7 @@ sleep 3 \n\
 exec java -jar app.jar --server.port=9090 \n\
 ' > entrypoint.sh
 
+
 RUN chmod +x entrypoint.sh
 
 EXPOSE 9090
