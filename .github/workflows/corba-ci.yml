@@ -1,18 +1,25 @@
-name: Backend Corba CI/CD 
+name: Backend Corba CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+    paths:
+      - 'JPA/corba/**'
+  pull_request:
+    branches: [ main ]
     paths:
       - 'JPA/corba/**'
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+env:
+  PROJECT_ID: cc-25-26
+  SERVICE_NAME: backend-corba
+  REGION: europe-west1
 
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout del código
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Configurar Java 17
@@ -23,28 +30,44 @@ jobs:
         cache: 'maven'
 
     - name: Compilar con Maven
-      working-directory: JPA/corba
-      run: mvn clean compile
+      run: |
+        cd JPA/corba
+        mvn clean compile
 
-    - name: Autenticar en Google Cloud
+  deploy-to-gcp:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Google Auth
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    - name: Configurar Docker para gcloud
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker for GCP
       run: gcloud auth configure-docker --quiet
 
-    - name: Construir y Subir Imagen a Artifact Registry
-      working-directory: JPA/corba
+    - name: Build and Push Container
       run: |
-        docker build -t gcr.io/TU_ID_DE_PROYECTO_AQUÍ/backend-corba:latest .
-        docker push gcr.io/TU_ID_DE_PROYECTO_AQUÍ/backend-corba:latest
+        cd JPA/corba
+        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
 
-    - name: Desplegar en Google Cloud Run
+    - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy backend-corba \
-          --image gcr.io/TU_ID_DE_PROYECTO_AQUÍ/backend-corba:latest \
+        gcloud run deploy $SERVICE_NAME \
+          --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
           --platform managed \
-          --region europe-west1 \
+          --region $REGION \
           --allow-unauthenticated \
-          --port 9090
+          --port 9090 \
+          --timeout 300
