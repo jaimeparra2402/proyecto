@@ -49,8 +49,7 @@ jobs:
         cd backend-node
         npx eslint . --ext .js || true 
 
-    # --- TESTING DE LA API Y PRUEBAS UNITARIAS (RÚBRICA) ---
-    # Ahora sí existe un MongoDB real en localhost gracias al servicio de arriba
+
     - name: Run Unit Tests with Coverage (Métricas)
       run: |
         cd backend-node
@@ -98,6 +97,6 @@ jobs:
           --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
           --platform managed \
           --region $REGION \
-          --allow-unauthenticated \
           --port 8080 \
+          --set-env-vars MONGO_URI="mongodb+srv://admin:admin@cluster0.kvkm1vk.mongodb.net/futbol_db?appName=Cluster0",NODE_ENV="production" \
           --timeout 300
