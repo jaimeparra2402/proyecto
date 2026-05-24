@@ -17,9 +17,10 @@ import { PlayerFactoryService } from '../../core/services/player-factory.service
   imports: [
     CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
     IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
-    IonAvatar, IonItem, IonLabel, IonList, IonListHeader, IonRow, IonCol, IonIcon
+    IonAvatar, IonItem, IonLabel, IonList, IonListHeader, IonRow, IonCol, IonIcond
   ]
 })
+
 export class PlayerDetailPage implements OnInit {
   player: any;
 

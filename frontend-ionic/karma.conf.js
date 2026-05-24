@@ -19,10 +19,10 @@ module.exports = function (config) {
         // for example, you can disable the random execution with `random: false`
         // or set a specific seed with `seed: 4321`
       },
-      clearContext: false // leave Jasmine Spec Runner output visible in browser
+      clearContext: false 
     },
     jasmineHtmlReporter: {
-      suppressAll: true // removes the duplicated traces
+      suppressAll: true 
     },
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage/app'),
@@ -38,10 +38,8 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     
-    // 👇 CAMBIO 1: Usar nuestro navegador personalizado sin interfaz gráfica
     browsers: ['ChromeHeadlessNoSandbox'],
 
-    // 👇 CAMBIO 2: Definir qué hace ese navegador (básicamente es Chrome oculto y seguro para servidores)
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
