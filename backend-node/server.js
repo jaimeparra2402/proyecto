@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-connectDB();
 
 app.set('views', path.join(__dirname, 'app_server', 'views'));
 app.set('view engine', 'pug');
@@ -84,8 +83,24 @@ try {
 }
 
 const PORT = process.env.PORT || 8080;
+
+
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log('MongoDB conectado');
+  } catch (err) {
+    console.error('MongoDB no disponible:', err.message);
+  }
+
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Node app listening on port ${PORT}`);
+  });
+
+  module.exports = { app, server };
+};
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Node app listening on port ${PORT}`);
 });
 
-module.exports = { app, server };
+startServer();
