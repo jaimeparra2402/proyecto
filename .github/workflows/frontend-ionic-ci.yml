@@ -10,6 +10,9 @@ on:
     paths:
       - 'frontend-ionic/**'
 
+    workflow_dispatch:
+
+
 env:
   PROJECT_ID: cc-25-26
   SERVICE_NAME: frontend-ionic
