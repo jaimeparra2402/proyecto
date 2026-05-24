@@ -1,0 +1,49 @@
+name: CI/CD Corba Backend
+
+on:
+  on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'JPA/backend-java/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    - name: Configurar Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'maven'
+
+    - name: Compilar con Maven (Valida que el IDL compile bien)
+      run: mvn clean compile
+
+    - name: Autenticar en Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Configurar Docker para gcloud
+      run: gcloud auth configure-docker --quiet
+
+    - name: Construir y Subir Imagen a Artifact Registry
+      run: |
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest .
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest
+
+    - name: Desplegar en Google Cloud Run
+      run: |
+        gcloud run deploy backend-corba \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest \
+          --platform managed \
+          --region europe-west1 \
+          --allow-unauthenticated \
+          --port 9090

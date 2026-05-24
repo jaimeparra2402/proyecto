@@ -1,0 +1,15 @@
+module CorbaModulo {
+    struct Noticia {
+        string titular;
+        string contenido;
+        string jugadorAsociado;
+        string fecha;
+    };
+    
+    typedef sequence<Noticia> ListaNoticias;
+
+    interface ServicioNoticias {
+        void enviarNoticia(in Noticia nuevaNoticia);
+        ListaNoticias obtenerNoticias();
+    };
+};
