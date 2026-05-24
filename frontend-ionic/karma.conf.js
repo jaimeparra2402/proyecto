@@ -37,7 +37,18 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    
+    // 👇 CAMBIO 1: Usar nuestro navegador personalizado sin interfaz gráfica
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    // 👇 CAMBIO 2: Definir qué hace ese navegador (básicamente es Chrome oculto y seguro para servidores)
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-setuid-sandbox']
+      }
+    },
+
     singleRun: false,
     restartOnFileChange: true
   });
