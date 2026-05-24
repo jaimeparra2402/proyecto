@@ -1,10 +1,12 @@
 name: Backend Corba CI/CD 
+
 on:
   push:
     branches:
       - main
     paths:
       - 'JPA/corba/**'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,7 +26,6 @@ jobs:
       working-directory: JPA/corba
       run: mvn clean compile
 
-
     - name: Autenticar en Google Cloud
       uses: google-github-actions/auth@v2
       with:
@@ -35,15 +36,16 @@ jobs:
 
     - name: Construir y Subir Imagen a Artifact Registry
       working-directory: JPA/corba
-
       run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest .
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest
+        # CAMBIA 'TU_ID_DE_PROYECTO_AQUÍ' POR EL ID DE TU GOOGLE CLOUD
+        docker build -t gcr.io/TU_ID_DE_PROYECTO_AQUÍ/backend-corba:latest .
+        docker push gcr.io/TU_ID_DE_PROYECTO_AQUÍ/backend-corba:latest
 
     - name: Desplegar en Google Cloud Run
       run: |
+        # CAMBIA 'TU_ID_DE_PROYECTO_AQUÍ' AQUÍ TAMBIÉN
         gcloud run deploy backend-corba \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest \
+          --image gcr.io/TU_ID_DE_PROYECTO_AQUÍ/backend-corba:latest \
           --platform managed \
           --region europe-west1 \
           --allow-unauthenticated \
