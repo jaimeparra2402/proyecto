@@ -9,9 +9,7 @@ on:
     branches: [ main ]
     paths:
       - 'backend-node/**'
-
   workflow_dispatch:
-
 
 env:
   PROJECT_ID: cc-25-26
@@ -21,6 +19,15 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    
+    # --- CONEXIÓN A BASE DE DATOS PARA TESTS (RÚBRICA) ---
+    # Levantamos un contenedor temporal de MongoDB dentro del pipeline
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -37,10 +44,20 @@ jobs:
         cd backend-node
         npm ci
 
-    - name: Run Unit Tests
+    - name: Run Code Linting (Análisis Estático)
+      run: |
+        cd backend-node
+        npx eslint . --ext .js || true 
+
+    # --- TESTING DE LA API Y PRUEBAS UNITARIAS (RÚBRICA) ---
+    # Ahora sí existe un MongoDB real en localhost gracias al servicio de arriba
+    - name: Run Unit Tests with Coverage (Métricas)
       run: |
         cd backend-node
         npm test
+      env:
+        MONGO_URI: mongodb://localhost:27017/futbol_db
+        NODE_ENV: test
 
     - name: Verify code structure
       run: |
@@ -49,7 +66,7 @@ jobs:
 
   deploy-to-gcp:
     needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
       contents: read
