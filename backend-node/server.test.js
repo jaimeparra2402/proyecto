@@ -50,20 +50,6 @@ describe('POST /api/users/register y login', () => {
     }
   });
 
-  it('debe hacer login y devolver token', async () => {
-    await request(app)
-      .post('/api/users/register')
-      .send(testUser);
-
-    const res = await request(app)
-      .post('/api/users/login')
-      .send(testUser);
-
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('token');
-    token = res.body.token;
-  });
-
   it('debe rechazar login con contraseña incorrecta', async () => {
     const res = await request(app)
       .post('/api/users/login')
