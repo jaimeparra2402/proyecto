@@ -1,13 +1,10 @@
-name: Backend Corba  CI/CD 
-
-
+name: Backend Corba CI/CD 
 on:
   push:
     branches:
       - main
     paths:
       - 'JPA/corba/**'
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,8 +20,10 @@ jobs:
         java-version: '17'
         cache: 'maven'
 
-    - name: Compilar con Maven (Valida que el IDL compile bien)
+    - name: Compilar con Maven
+      working-directory: JPA/corba
       run: mvn clean compile
+
 
     - name: Autenticar en Google Cloud
       uses: google-github-actions/auth@v2
@@ -35,6 +34,8 @@ jobs:
       run: gcloud auth configure-docker --quiet
 
     - name: Construir y Subir Imagen a Artifact Registry
+      working-directory: JPA/corba
+
       run: |
         docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest .
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-corba:latest
