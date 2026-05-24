@@ -1,5 +1,5 @@
 const errorHandler = (err, req, res, next) => {
-  console.error('💥 Error interceptado:', err.stack);
+  console.error('Error interceptado:', err.stack);
 
   if (err.name === 'ValidationError') {
     const messages = Object.values(err.errors).map(el => el.message);
