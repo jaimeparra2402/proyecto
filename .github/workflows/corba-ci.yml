@@ -9,6 +9,8 @@ on:
     branches: [ main ]
     paths:
       - 'JPA/corba/**'
+  
+  workflow_dispatch:
 
 env:
   PROJECT_ID: cc-25-26
