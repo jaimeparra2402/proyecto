@@ -10,7 +10,7 @@ on:
     paths:
       - 'frontend-ionic/**'
 
-    workflow_dispatch:
+  workflow_dispatch:
 
 
 env:
