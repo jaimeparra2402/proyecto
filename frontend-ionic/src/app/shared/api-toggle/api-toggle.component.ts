@@ -1,27 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonItem, IonLabel, IonToggle } from '@ionic/angular/standalone'; 
 import { BackendToggleService, BackendType } from '../../core/services/backend-toggle.service';
+import { IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-api-toggle',
-  templateUrl: './api-toggle.component.html',
+  template: `
+    <ion-item lines="none">
+      <ion-label>Backend Activo:</ion-label>
+      <ion-select [value]="currentBackend()" (ionChange)="changeBackend($event)">
+        <ion-select-option value="NODE">Node.js (TRWM)</ion-select-option>
+        <ion-select-option value="JAVA">Java (DWSC)</ion-select-option>
+      </ion-select>
+    </ion-item>
+  `,
   standalone: true,
-  imports: [CommonModule, IonItem, IonLabel, IonToggle] 
+  imports: [CommonModule, IonItem, IonLabel, IonSelect, IonSelectOption]
 })
-export class ApiToggleComponent implements OnInit {
-  current: BackendType = 'NODE';
+export class ApiToggleComponent {
+  private toggleService = inject(BackendToggleService);
 
-  constructor(private toggleService: BackendToggleService) {}
-
-  ngOnInit() {
-    this.toggleService.backend$.subscribe(backend => {
-      this.current = backend;
-    });
+  currentBackend() {
+    return this.toggleService.getBackend();
   }
 
-  onToggleChange(event: any) {
-    const isJava = event.detail.checked;
-    this.toggleService.setBackend(isJava ? 'JAVA' : 'NODE');
+  changeBackend(event: any) {
+    const selected: BackendType = event.detail.value;
+    this.toggleService.setBackend(selected);
+    window.location.reload();
   }
 }

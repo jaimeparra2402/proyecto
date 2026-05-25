@@ -14,11 +14,8 @@ export class PlayerFactoryService {
     private javaService: JavaPlayerService
   ) {}
 
-  getStrategy(): PlayerStrategy {
+  getService(): PlayerStrategy {
     const activeBackend = this.toggleService.getBackend();
-    if (activeBackend === 'JAVA') {
-      return this.javaService;
-    }
-    return this.nodeService;
+    return activeBackend === 'NODE' ? this.nodeService : this.javaService;
   }
 }

@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Portal de Jugadores</ion-title>
+  </ion-toolbar>
+  <app-api-toggle></app-api-toggle>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 40px auto 0 auto;">
+    <ion-button color="success" (click)="goToRegister()">
+      Registrarse
+    </ion-button>
+    
+    <ion-button color="primary" (click)="goToList()">
+      Listado de Jugadores
+    </ion-button>
+    
+    <ion-button color="secondary" (click)="goToSearch()">
+      Buscar Jugadores
+    </ion-button>
+  </div>
+</ion-content>

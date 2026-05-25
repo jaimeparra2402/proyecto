@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -6,26 +7,21 @@ const connectDB = require('./api_server/models/db');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.set('views', path.join(__dirname, 'app_server', 'views'));
-app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
-
-try {
-  const appRouter = require('./app_server/routes/index');
-  app.use('/', appRouter);
-} catch (e) {
-  console.log('Nota: app_server/routes/index.js no encontrado. Saltando.');
-}
 
 const playerRoutes = require('./api_server/routes/playerRoutes');
 const userRoutes = require('./api_server/routes/userRoutes');
 const externalRoutes = require('./api_server/routes/externalRoutes');
 
-app.use('/api/noticias', playerRoutes);
+app.use('/api/players', playerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/external', externalRoutes);
 
@@ -40,30 +36,36 @@ try {
   const swaggerUi = require('swagger-ui-express');
   const swaggerSpec = require('./api_server/models/swaggerSpec');
 
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { cacheControl: false }));
   app.get('/swagger-ui', (req, res) => res.redirect('/api-docs'));
 
-  console.log('Swagger docs disponibles en /api-docs');
+  console.log('Swagger docs disponibles en http://localhost:3000/api-docs');
 } catch (err) {
   console.error('Swagger failed to load:', err.message);
 }
 
-try {
-  const errorHandler = require('./api_server/middleware/errorHandler');
-  app.use(errorHandler);
-} catch (e) {
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Internal Server Error' });
-  });
-}
+app.use((err, req, res, next) => {
+  console.error("💥 Error cazado en el servidor:", err.stack);
 
-const PORT = process.env.PORT || 8080;
+  if (err.code === 11000) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'El registro ya existe en la base de datos.'
+    });
+  }
+
+  res.status(err.status || 500).json({
+    status: 'error',
+    message: err.message || 'Error interno del servidor'
+  });
+});
+
+const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
     await connectDB();
-    console.log('MongoDB conectado');
+    console.log('MongoDB conectado con éxito');
   } catch (err) {
     console.error('MongoDB no disponible:', err.message);
   }

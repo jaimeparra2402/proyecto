@@ -3,56 +3,94 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ player?.name || 'Cargando...' }}</ion-title>
+    <ion-title>Ficha del Jugador</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <div *ngIf="player">
-    <ion-row class="ion-justify-content-center ion-margin-bottom">
-      <ion-col size="auto">
-        <ion-avatar style="width: 150px; height: 150px; border: 3px solid var(--ion-color-primary);">
-          <img [src]="player.imageUrl || 'assets/placeholder-player.png'" alt="Player image" />
-        </ion-avatar>
-      </ion-col>
-    </ion-row>
+<ion-content class="ion-padding" *ngIf="player">
+  <ion-card>
+    <img
+      [src]="player.image || 'assets/placeholder-player.png'"
+      style="width: 100%; height: 250px; object-fit: cover"
+    />
+    <ion-card-header>
+      <ion-card-title>{{ player.name }}</ion-card-title>
+      <ion-card-subtitle>{{ player.team }} - {{ player.league }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Posición:</strong> {{ player.position || 'No definida' }}</p>
+      <p><strong>Edad:</strong> {{ player.age || 'Desconocida' }}</p>
+    </ion-card-content>
+  </ion-card>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-subtitle>Datos Principales</ion-card-subtitle>
-        <ion-card-title>{{ player.name }}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list lines="none">
-          <ion-item>
-            <ion-label>
-              <p>Equipo / Liga</p>
-              <h3>{{ player.teamLeague }}</h3>
-            </ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label>
-              <p>Fecha Alta</p>
-              <h3>{{ player.createdAt | date:'dd/MM/yyyy' }}</h3>
-            </ion-label>
-          </ion-item>
-          <ion-item *ngIf="player.location">
-             <ion-label>
-                <p>Ubicación (GeoJSON)</p>
-                <h3>{{ player.location.coordinates[0] }}, {{ player.location.coordinates[1] }}</h3>
-             </ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-
-    <div *ngIf="player.location" class="map-container ion-margin-top" style="height: 200px; background-color: #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-        [Mapa Interactivo Leaflet/Google]
-    </div>
-
-    <ion-list-header>
-        <ion-label>Estadísticas / Comentarios</ion-label>
-    </ion-list-header>
-
+  <div *ngIf="authService.isUserAdmin()" class="ion-padding">
+    <ion-button color="warning" (click)="editPlayer()">Editar Datos</ion-button>
+    <ion-button color="danger" (click)="deletePlayer()">Eliminar Jugador</ion-button>
   </div>
+
+  <h3 class="ion-margin-start">Comentarios y Valoraciones</h3>
+
+  <ion-list lines="inset" class="ion-margin-bottom">
+    <ion-item *ngFor="let c of comments">
+      <ion-label class="ion-text-wrap">
+        <h3><strong>{{ c.author }}</strong> — {{ c.rating }} Estrellas</h3>
+        <p>{{ c.text }}</p>
+        <small *ngIf="c.latitude" style="color: gray">
+          {{ c.latitude | number:'1.2-2' }}, {{ c.longitude | number:'1.2-2' }}
+        </small>
+      </ion-label>
+      <ion-button
+        slot="end"
+        color="danger"
+        fill="clear"
+        *ngIf="authService.isUserAdmin()"
+        (click)="removeComment(c._id || c.id)"
+      >
+        Borrar
+      </ion-button>
+    </ion-item>
+    <p *ngIf="!comments || comments.length === 0" class="ion-margin-start">
+      No hay comentarios aún. ¡Sé el primero!
+    </p>
+  </ion-list>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Añadir Comentario</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item class="ion-margin-bottom">
+        <ion-input
+          label="Tu Nombre"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="author"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-bottom">
+        <ion-textarea
+          label="Comentario (Máx 1000 car.)"
+          labelPlacement="floating"
+          [(ngModel)]="commentText"
+          rows="3"
+        ></ion-textarea>
+      </ion-item>
+
+      <ion-item class="ion-margin-bottom">
+        <ion-select label="Valoración" [(ngModel)]="rating">
+          <ion-select-option [value]="5">5 Estrellas</ion-select-option>
+          <ion-select-option [value]="4">4 Estrellas</ion-select-option>
+          <ion-select-option [value]="3">3 Estrellas</ion-select-option>
+          <ion-select-option [value]="2">2 Estrellas</ion-select-option>
+          <ion-select-option [value]="1">1 Estrella</ion-select-option>
+          <ion-select-option [value]="0">0 Estrellas</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-button expand="block" (click)="sendComment()">
+        Publicar Comentario con Geo
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

@@ -1,28 +1,38 @@
 const mongoose = require('mongoose');
 
-const CommentSchema = new mongoose.Schema({
-  author: { type: String, required: true },
-  comment: { type: String, required: true, maxlength: 1000 },
-  rating: { type: Number, required: true, min: 0, max: 5 },
-  location: {
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
+const commentSchema = new mongoose.Schema({
+  userId: { type: String, required: true },       // ID de Firebase
+  author: { type: String, required: true },       // Nombre/Email del autor
+  text: { 
+    type: String, 
+    required: true, 
+    maxlength: 1000                               // Máximo 1000 caracteres pedido por el proyecto
+  },
+  rating: { 
+    type: Number, 
+    required: true, 
+    min: 0, 
+    max: 5                                        // Valoración de 0 a 5 estrellas
   },
   createdAt: { type: Date, default: Date.now }
 });
 
-const PlayerSchema = new mongoose.Schema({
+const playerSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
-  teamLeague: { type: String, required: true, trim: true },
-  imageUrl: { type: String, required: true },
-  location: {
-    type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: { type: [Number], required: true }
+  team: { type: String, required: true, trim: true },      // Equipo o Liga para los filtros
+  league: { type: String, trim: true },
+  position: { type: String, required: true },
+  imageUrl: { type: String, required: true },             // URL de la imagen (Cámara o API externa)
+  stats: {
+    goals: { type: Number, default: 0 },
+    assists: { type: Number, default: 0 },
+    matchesPlayed: { type: Number, default: 0 }
   },
-  createdAt: { type: Date, default: Date.now },
-  comments: [CommentSchema]
+  comments: [commentSchema],                              // Comentarios incrustados
+  createdAt: { type: Date, default: Date.now }             // Fecha de alta en el sistema (para filtros)
 });
 
-PlayerSchema.index({ location: '2dsphere' });
+// Índice para mejorar las búsquedas por texto
+playerSchema.index({ name: 'text', team: 'text' });
 
-module.exports = mongoose.model('Player', PlayerSchema);
+module.exports = mongoose.model('Player', playerSchema);

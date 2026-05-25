@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/landing"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Registro</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item class="ion-margin-bottom">
+    <ion-input
+      label="Nombre de usuario"
+      labelPlacement="floating"
+      type="text"
+      [(ngModel)]="username"
+    >
+    </ion-input>
+  </ion-item>
+
+  <ion-item class="ion-margin-bottom">
+    <ion-input
+      label="Correo"
+      labelPlacement="floating"
+      type="email"
+      [(ngModel)]="email"
+    >
+    </ion-input>
+  </ion-item>
+
+  <ion-item class="ion-margin-bottom">
+    <ion-input
+      label="Contraseña"
+      labelPlacement="floating"
+      type="password"
+      [(ngModel)]="password"
+    >
+    </ion-input>
+  </ion-item>
+
+  <p
+    *ngIf="errorMessage"
+    style="color: var(--ion-color-danger); margin-left: 10px"
+  >
+    {{ errorMessage }}
+  </p>
+  <ion-button
+    expand="block"
+    fill="clear"
+    routerLink="/login"
+    class="ion-margin-top"
+  >
+    ¿Ya tienes cuenta? Inicia sesión aquí
+  </ion-button>
+
+  <ion-button expand="block" (click)="onRegister()" class="ion-margin-top">
+    Crear Cuenta
+  </ion-button>
+</ion-content>

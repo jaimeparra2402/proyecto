@@ -1,84 +1,100 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, 
-  IonList, IonItem, IonLabel, IonAvatar, IonSearchbar, 
-  IonButton, IonIcon, IonModal, IonDatetime, IonDatetimeButton
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { filter, calendarOutline } from 'ionicons/icons';
-
-import { ApiToggleComponent } from '../../shared/api-toggle/api-toggle.component';
+import { Router } from '@angular/router';
 import { PlayerFactoryService } from '../../core/services/player-factory.service';
-import { BackendToggleService } from '../../core/services/backend-toggle.service';
+import { AuthService } from '../../core/services/auth.service'; // 👈 Tu servicio con el rol
+import { ApiToggleComponent } from '../../shared/api-toggle/api-toggle.component';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonList,
+  IonItem,
+  IonAvatar,
+  IonLabel,
+  IonSearchbar,
+  IonButton,
+  IonCard,
+  IonCardContent,
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, 
-    IonList, IonItem, IonLabel, IonAvatar, IonSearchbar, 
-    IonButton, IonIcon, IonModal, IonDatetime, IonDatetimeButton,
-    ApiToggleComponent
+    ApiToggleComponent,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonList,
+    IonItem,
+    IonAvatar,
+    IonLabel,
+    IonSearchbar,
+    IonButton,
+    IonCard,
+    IonCardContent,
   ],
 })
 export class HomePage implements OnInit {
-  players: any[] = [];
-  
-  searchName: string = '';
-  searchTeam: string = '';
-  searchDate: string = '';
+  private playerFactory = inject(PlayerFactoryService);
+  public authService = inject(AuthService); // 👈 DEBE SER PUBLIC PARA EL HTML
+  private router = inject(Router);
 
-  constructor(
-    private playerFactory: PlayerFactoryService,
-    private toggleService: BackendToggleService
-  ) {
-    addIcons({ filter, calendarOutline });
-  }
+  players: any[] = [];
+  searchName = '';
+  searchTeam = '';
 
   ngOnInit() {
-    this.toggleService.backend$.subscribe(() => {
-      this.loadPlayers();
-    });
+    this.loadPlayers();
   }
 
   loadPlayers() {
     const filters: any = {};
     if (this.searchName) filters.name = this.searchName;
-    if (this.searchTeam) filters.teamLeague = this.searchTeam;
-    if (this.searchDate) filters.createdAt = this.searchDate;
+    if (this.searchTeam) filters.team = this.searchTeam;
 
-    this.playerFactory.getStrategy().getPlayers(filters).subscribe({
-      next: (response: any) => {
-        this.players = response.data ? response.data : response;
-      },
-      error: (err: any) => {
-        console.error('Error:', err);
-        this.players = [];
-      }
-    });
+    this.playerFactory
+      .getService()
+      .getPlayers(filters)
+      .subscribe({
+        next: (data) => this.players = data,
+        error: (err) => console.error(err),
+      });
   }
 
-  onSearchChange() {
-    this.loadPlayers();
+  // NAVEGACIÓN PÚBLICA DE USUARIOS
+  goToImportApi() {
+    this.router.navigate(['/import-api']);
   }
 
-  onDateChange(event: any) {
-    if (event.detail.value) {
-      this.searchDate = event.detail.value.split('T')[0];
-      this.loadPlayers();
-    }
+  goToAddPlayerForm() {
+    this.router.navigate(['/add-player']);
   }
 
-  clearFilters() {
-    this.searchName = '';
-    this.searchTeam = '';
-    this.searchDate = '';
-    this.loadPlayers();
+  goToIdealTeam() {
+    this.router.navigate(['/ideal-team']);
+  }
+
+  goToViewNews() {
+    this.router.navigate(['/view-news-corba']);
+  }
+
+  // NAVEGACIÓN EXCLUSIVA ADMIN
+  goToCreateNewsCorba() {
+    this.router.navigate(['/create-news-corba']);
+  }
+
+  async logout() {
+    await this.authService.logout();
+    localStorage.removeItem('token');
+    this.router.navigate(['/landing']);
   }
 }

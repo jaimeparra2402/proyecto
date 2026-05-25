@@ -34,7 +34,6 @@ jobs:
     - name: Compilar con Maven
       run: |
         cd JPA/corba
-        # CAMBIAMOS 'compile' POR 'package -DskipTests'
         mvn clean package -DskipTests
 
   deploy-to-gcp:

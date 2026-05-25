@@ -1,27 +1,29 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PlayerStrategy } from './player.strategy';
 import { Observable } from 'rxjs';
+import { PlayerStrategy } from './player.strategy';
+import { environment } from '../../../environments/environment';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class JavaPlayerService implements PlayerStrategy {
-  private apiUrl = 'https://backend-java-1089195621635.europe-west1.run.app/api/players'; 
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiJava}/players`;
 
-  constructor(private http: HttpClient) {}
-
-  getPlayers(filters?: any): Observable<any> {
-    return this.http.get(this.apiUrl, { params: filters });
+  getPlayers(filters?: any): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl, { params: filters });
   }
+
   getPlayerById(id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
-  createPlayer(playerData: any): Observable<any> {
-    return this.http.post(this.apiUrl, playerData);
-  }
+
   deletePlayer(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
-  addComment(playerId: string, commentData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${playerId}/comments`, commentData);
+
+  addComment(playerId: string, comment: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${playerId}/comments`, comment);
   }
 }

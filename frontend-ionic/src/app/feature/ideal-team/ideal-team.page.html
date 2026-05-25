@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Equipo Ideal IA</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="ion-text-center ion-margin-vertical">
+    <p>Haz uso del motor de Inteligencia Artificial para estudiar tu base de datos local y proponer la alineación definitiva.</p>
+    <ion-button color="sparkles" [disabled]="loading" (click)="generateDreamTeam()">
+      Calcular Táctica Recomendada
+    </ion-button>
+  </div>
+
+  <div *ngIf="loading" class="ion-text-center ion-padding">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Analizando rendimiento y posiciones por la IA...</p>
+  </div>
+
+  <ion-card *ngIf="aiResponse">
+    <ion-card-content>
+      <div style="white-space: pre-wrap; font-size: 1.05em; line-height: 1.4;">
+        {{ aiResponse }}
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
