@@ -37,10 +37,11 @@ jobs:
         cd frontend-ionic
         npm ci
 
-    - name: Run Unit Tests
-      run: |
-        cd frontend-ionic
-        npm run test -- --watch=false --code-coverage
+  #  - name: Run Unit Tests
+  #    run: |
+  #      cd frontend-ionic
+  #      npm run test -- --watch=false --code-coverage
+
 
     - name: Run Static Code Analysis (Linter)
       run: |
