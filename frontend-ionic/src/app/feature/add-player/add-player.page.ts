@@ -126,7 +126,7 @@ export class AddPlayerPage implements OnInit {
       next: () => {
         this.router.navigate(['/home']);
       },
-      error: (err) => console.error('Error al guardar el jugador:', err)
+      error: (err: any) => console.error('Error al guardar el jugador:', err)
     });
   }
 }
