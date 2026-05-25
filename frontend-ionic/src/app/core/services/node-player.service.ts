@@ -26,4 +26,9 @@ export class NodePlayerService implements PlayerStrategy {
   addComment(playerId: string, comment: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/${playerId}/comments`, comment);
   }
+
+  // ✅ FALTABA ESTE MÉTODO
+  createPlayer(player: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, player);
+  }
 }
