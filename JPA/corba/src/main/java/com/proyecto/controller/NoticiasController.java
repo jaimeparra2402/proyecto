@@ -27,7 +27,6 @@ public class NoticiasController {
             return "El servicio CORBA no está disponible.";
         }
         
-        // Mapeamos el objeto recibido al formato estructurado de CORBA
         Noticia noticiaCorba = new Noticia(
             nuevaNoticia.getTitular(),
             nuevaNoticia.getContenido(),
