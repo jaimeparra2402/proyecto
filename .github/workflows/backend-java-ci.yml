@@ -59,6 +59,8 @@ jobs:
         SPRING_PROFILES_ACTIVE: test
         EUREKA_CLIENT_ENABLED: "false"
         SPRING_CLOUD_CONFIG_ENABLED: "false"
+        API_FOOTBALL_KEY: 4f63c05c501e3759ae6fd3a9bcda27ea
+        SPRING_AI_GOOGLE_AI_API_KEY: AIzaSyFakeGeminiKeyForGitHubActionsTest
 
     - name: Verify code structure
       run: |
