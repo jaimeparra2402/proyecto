@@ -1,0 +1,63 @@
+.auth-header {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+
+  .auth-icon {
+    font-size: 56px;
+    color: var(--ion-color-primary);
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+.auth-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--ion-color-danger);
+  margin: 4px 0 0 16px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--ion-color-danger-tint);
+  color: var(--ion-color-danger);
+  font-size: 14px;
+
+  ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.item-error {
+  --border-color: var(--ion-color-danger);
+}
+
+.main-btn {
+  margin-top: 1.5rem;
+  --border-radius: 10px;
+}
+
+.secondary-btn {
+  margin-top: 0.5rem;
+  font-size: 14px;
+}

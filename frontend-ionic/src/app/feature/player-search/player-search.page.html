@@ -3,39 +3,76 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/landing"></ion-back-button>
     </ion-buttons>
-    <ion-title>Buscador</ion-title>
+    <ion-title>Buscar jugador</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-card class="ion-no-margin ion-margin-bottom">
+  <ion-card class="search-card ion-no-margin ion-margin-bottom">
     <ion-card-content>
-      <ion-searchbar 
-        placeholder="Buscar por nombre..." 
-        [(ngModel)]="searchName" 
-        (ionInput)="loadPlayers()">
+      <ion-searchbar
+        placeholder="Nombre del jugador (mín. 3 letras)"
+        [(ngModel)]="searchName"
+        [debounce]="0"
+        show-clear-button="focus"
+      >
       </ion-searchbar>
-      
-      <ion-searchbar 
-        placeholder="Buscar por Equipo/Liga..." 
-        [(ngModel)]="searchTeam" 
-        (ionInput)="loadPlayers()">
-      </ion-searchbar>
+
+      <ion-select
+        placeholder="Liga (obligatorio)"
+        [(ngModel)]="searchLeague"
+        fill="outline"
+        class="custom-select"
+      >
+        <ion-select-option *ngFor="let l of leagues" [value]="l.value">
+          {{ l.label }}
+        </ion-select-option>
+      </ion-select>
+
+      <ion-select
+        placeholder="Temporada (obligatorio)"
+        [(ngModel)]="searchSeason"
+        fill="outline"
+        class="custom-select"
+      >
+        <ion-select-option *ngFor="let s of seasons" [value]="s">
+          {{ s }}/{{ +s + 1 }}
+        </ion-select-option>
+      </ion-select>
+
+      <p *ngIf="!formValid" class="hint-text">
+        <span *ngIf="searchName.length < 3">· Escribe al menos 3 letras</span>
+        <span *ngIf="!searchLeague">· Selecciona una liga</span>
+        <span *ngIf="!searchSeason">· Selecciona una temporada</span>
+      </p>
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top"
+        [disabled]="!formValid || loading"
+        (click)="search()"
+      >
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        {{ loading ? 'Buscando...' : 'Buscar' }}
+      </ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-list lines="inset">
-    <ion-item *ngFor="let player of players">
-      <ion-avatar slot="start">
-        <img [src]="player.image || 'assets/placeholder-player.png'" alt="Jugador" />
-      </ion-avatar>
-      <ion-label>
-        <h2>{{ player.name }}</h2>
-        <p>{{ player.team }} - {{ player.league }}</p>
-      </ion-label>
-    </ion-item>
-    <p *ngIf="players.length === 0 && (searchName || searchTeam)" class="ion-margin-start">
-      No se han encontrado resultados.
-    </p>
-  </ion-list>
+  <div *ngIf="loading" class="ion-text-center ion-padding">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <app-list
+    *ngIf="!loading && players.length > 0"
+    [items]="players"
+    [type]="'external'"
+  >
+  </app-list>
+
+  <div
+    *ngIf="!loading && searched && players.length === 0"
+    class="empty-state ion-text-center ion-padding"
+  >
+    <p>No se encontraron jugadores.</p>
+  </div>
 </ion-content>

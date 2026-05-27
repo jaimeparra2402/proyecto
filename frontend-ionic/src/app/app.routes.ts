@@ -18,9 +18,9 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/home/home.page').then((m) => m.HomePage),
   },
   {
-    path: 'player-detail',
-    loadComponent: () => import('./feature/player-detail/player-detail.page').then((m) => m.PlayerDetailPage),
-  },
+  path: 'player-detail/:id', 
+  loadComponent: () => import('./feature/player-detail/player-detail.page').then((m) => m.PlayerDetailPage),
+},
   {
     path: 'register',
     loadComponent: () => import('./feature/auth/register/register.page').then((m) => m.RegisterPage),
@@ -42,4 +42,5 @@ export const routes: Routes = [
     redirectTo: 'landing',
     pathMatch: 'full',
   },
+
 ];

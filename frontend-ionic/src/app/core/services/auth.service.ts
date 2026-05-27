@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http'; 
+import { HttpClient } from '@angular/common/http';
 import {
   Auth,
   user,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
   signOut,
 } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -16,61 +16,100 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   private auth = inject(Auth);
-  private http = inject(HttpClient); 
-  
+  private http = inject(HttpClient);
+
   private backendUrl = `${environment.apiNode}/users`;
 
+  // Autenticación de Usuario de Firebase
   public user$ = user(this.auth);
   public currentUser = toSignal(this.user$);
 
-  // Un BehaviorSubject para saber el rol en tiempo real en la app
+  // Control de estado clásico para compatibilidad reactiva interna
   private isAdminSubject = new BehaviorSubject<boolean>(false);
   public isAdmin$ = this.isAdminSubject.asObservable();
 
-  async login(email: string, password: string) {
-    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-    
-    // Obtenemos el token y forzamos el refresco para leer los roles (claims)
-    const idTokenResult = await userCredential.user.getIdTokenResult(true);
-    
-    // Hardcodeamos tu cuenta de administrador aquí para la defensa si no usas el backend de Node,
-    // o leemos el claim personalizado si lo configuraste en Firebase Console
-    if (email === 'admin@futbolapp.com' || idTokenResult.claims['role'] === 'admin') {
-      this.isAdminSubject.next(true);
-    } else {
-      this.isAdminSubject.next(false);
-    }
+  /**
+   * 🌟 EL SALVADOR DE LA NAVEGACIÓN: Signal Reactivo Avanzado.
+   * Al transformarlo en Signal, cualquier HTML de la app que lo use (con paréntesis)
+   * se actualizará automáticamente y mantendrá el valor vivo durante toda la sesión.
+   */
+  public isSystemAdmin = toSignal(this.isAdmin$, { initialValue: false });
 
-    return userCredential.user.getIdToken(); 
+  constructor() {
+    // Rehidratación inmediata del estado al instanciar el servicio (Evita caídas por F5)
+    const savedRole = localStorage.getItem('userRole');
+    if (savedRole === 'admin') {
+      this.isAdminSubject.next(true);
+    }
   }
 
-  async registerInFirebaseAndBackend(username: string, email: string, password: string): Promise<any> {
-    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-    
-    // Todos los usuarios nuevos serán normales
-    this.isAdminSubject.next(false);
+  async login(email: string, password: string) {
+    const userCredential = await signInWithEmailAndPassword(
+      this.auth,
+      email,
+      password,
+    );
 
-    // Omitimos la llamada al backend de Node temporalmente si está apagado
+    // Validación estricta basada en el correo elegido
+    if (email.toLowerCase() === 'admin@gmail.com') {
+      this.isAdminSubject.next(true);
+      localStorage.setItem('userRole', 'admin'); // Persistencia en navegador
+    } else {
+      this.isAdminSubject.next(false);
+      localStorage.removeItem('userRole');
+    }
+
+    return userCredential.user.getIdToken();
+  }
+
+  async registerInFirebaseAndBackend(
+    email: string,
+    password: string,
+  ): Promise<any> {
+    const userCredential = await createUserWithEmailAndPassword(
+      this.auth,
+      email,
+      password,
+    );
+
+    // Por seguridad, un usuario registrado públicamente nunca inicia como admin
+    this.isAdminSubject.next(false);
+    localStorage.removeItem('userRole');
+
     try {
       const idToken = await userCredential.user.getIdToken();
+      const fallbackUsername = email.split('@')[0];
+
       const backendData = {
-        username: username,
+        username: fallbackUsername,
+        email: email,
         password: password,
-        role: 'user'
+        role: 'user',
       };
+
       return await firstValueFrom(
         this.http.post(`${this.backendUrl}/register`, backendData, {
-          headers: { Authorization: `Bearer ${idToken}` }
-        })
+          headers: { Authorization: `Bearer ${idToken}` },
+        }),
       );
     } catch (e) {
-      console.warn('Backend Node inaccesible, usuario creado solo en Firebase Auth.');
+      console.warn(
+        'Backend Node inaccesible, usuario creado solo en Firebase Auth.',
+        e,
+      );
       return userCredential.user;
     }
   }
-
+  // Añade esto en tu auth.service.ts
+    async getActiveToken(): Promise<string | null> {
+      if (this.auth.currentUser) {
+        return await this.auth.currentUser.getIdToken();
+      }
+      return null;
+    }
   async logout() {
     this.isAdminSubject.next(false);
+    localStorage.removeItem('userRole'); // Limpieza absoluta de la memoria
     return signOut(this.auth);
   }
 
@@ -78,8 +117,10 @@ export class AuthService {
     return this.auth.currentUser?.uid;
   }
 
-  // Método rápido para comprobar de forma síncrona en las vistas de la app
+  // Mantenemos este método por si alguna lógica de TypeScript antigua aún lo llama de forma síncrona
   isUserAdmin(): boolean {
-    return this.isAdminSubject.value;
+    return (
+      this.isAdminSubject.value || localStorage.getItem('userRole') === 'admin'
+    );
   }
 }

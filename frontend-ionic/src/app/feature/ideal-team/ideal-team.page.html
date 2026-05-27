@@ -11,20 +11,45 @@
   <div class="ion-text-center ion-margin-vertical">
     <p>Haz uso del motor de Inteligencia Artificial para estudiar tu base de datos local y proponer la alineación definitiva.</p>
     <ion-button color="sparkles" [disabled]="loading" (click)="generateDreamTeam()">
+      <ion-icon name="sparkles-outline" slot="start"></ion-icon>
       Calcular Táctica Recomendada
     </ion-button>
   </div>
 
-  <div *ngIf="loading" class="ion-text-center ion-padding">
+  <div *ngIf="loading" class="ion-text-center ion-padding main-loader">
     <ion-spinner name="crescent"></ion-spinner>
     <p>Analizando rendimiento y posiciones por la IA...</p>
   </div>
 
-  <ion-card *ngIf="aiResponse">
-    <ion-card-content>
-      <div style="white-space: pre-wrap; font-size: 1.05em; line-height: 1.4;">
-        {{ aiResponse }}
-      </div>
-    </ion-card-content>
-  </ion-card>
+  <div *ngIf="errorMessage" class="ion-text-center ion-padding ion-color-danger">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="aiResponse" class="ai-container">
+    
+    <div class="formation-header ion-text-center ion-margin-bottom">
+      <ion-badge color="success" class="formation-badge">Formación: {{ aiResponse.formacion }}</ion-badge>
+    </div>
+
+    <h3 class="section-title">El Once Ideal</h3>
+    <ion-card class="player-card" *ngFor="let jugador of aiResponse.once_ideal">
+      <ion-card-content class="player-content">
+        <div class="player-info-header">
+          <div class="player-meta">
+            <h2 class="player-name">{{ jugador.nombre }}</h2>
+            <ion-badge color="secondary" class="position-badge">{{ jugador.posicion }}</ion-badge>
+          </div>
+        </div>
+        <p class="player-reason">{{ jugador.motivo }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <h3 class="section-title ion-margin-top">Análisis Táctico de la IA</h3>
+    <ion-card class="tactical-card">
+      <ion-card-content>
+        <p class="tactical-text">{{ aiResponse.analisis_tactico }}</p>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
 </ion-content>

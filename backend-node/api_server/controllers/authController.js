@@ -29,19 +29,19 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    // 🕵️ CHIVATO: Veremos en la terminal qué token está llegando desde Swagger
     console.log("🎟️ Token recibido en el servidor:", token);
-    console.log("🔑 Token esperado (.env):", process.env.JWT_SECRET);
-
-    // Comparamos limpiando posibles espacios en blanco
-    if (token.trim() === process.env.JWT_SECRET.trim()) {
-      console.log("🟢 ¡Bypass de desarrollo activado con éxito! Entrando como Admin.");
-      req.user = {
-        id: "mock_admin_123",
-        username: "admin_tester@proyecto.com",
-        role: "admin"
-      };
-      return next();
+    if (process.env.JWT_SECRET) {
+      console.log("🔑 Token esperado (.env):", process.env.JWT_SECRET);
+      if (token.trim() === process.env.JWT_SECRET.trim()) {
+        console.log("🟢 ¡Bypass de desarrollo activado con éxito! Entrando como Admin.");
+        req.user = {
+          id: "mock_admin_123",
+          username: "admin_tester@proyecto.com",
+          email: "admin@gmail.com",
+          role: "admin"
+        };
+        return next();
+      }
     }
 
     if (admin.apps.length) {
@@ -50,7 +50,8 @@ exports.protect = async (req, res, next) => {
         req.user = {
           id: decodedToken.uid,
           username: decodedToken.email || decodedToken.name,
-          role: decodedToken.role || 'user'
+          email: decodedToken.email || "",
+          role: (decodedToken.email === 'admin@gmail.com') ? 'admin' : (decodedToken.role || 'user')
         };
         return next();
       } catch (fbError) {
@@ -76,12 +77,20 @@ exports.protect = async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ 
-        status: 'fail', 
-        message: 'No tienes permisos de administrador para realizar esta acción.' 
+
+    const tuEmailDeIonic = 'admin@gmail.com'; 
+
+    if (req.user && (req.user.email === tuEmailDeIonic || req.user.role === 'admin')) {
+      return next(); 
+    }
+
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'No tienes permisos de administrador para realizar esta acción.'
       });
     }
-    return next();
+
+    next();
   };
 };

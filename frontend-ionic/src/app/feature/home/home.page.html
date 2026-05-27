@@ -6,11 +6,14 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <div class="user-greeting">
+    <h2>¡Hola, {{ getUsername() }}!</h2>
+    <p>Conectado como: {{ authService.currentUser()?.email }}</p>
+  </div>
 
   <div class="ion-margin-bottom">
-    <h3 style="margin-left: 5px; font-size: 0.9rem; color: gray; text-transform: uppercase;">Funciones de Usuario</h3>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-      
+    <h3 class="section-title">Funciones de Usuario</h3>
+    <div class="button-grid">
       <ion-button color="primary" (click)="goToImportApi()">
         Importar desde API Fútbol
       </ion-button>
@@ -23,31 +26,27 @@
         Equipo Ideal IA
       </ion-button>
 
-      <ion-button color="medium" (click)="goToViewNews()">
-        Ver Noticias CORBA
+      <div *ngIf="authService.isSystemAdmin()">
+          <ion-button color="danger" (click)="goToViewNews()">
+            Publicar Noticia CORBA
+          </ion-button>
+      </div>
+
+      <ion-button color="secondary" (click)="goToPlayerList()">
+        Ver Todos los Jugadores
       </ion-button>
-      
+
+      <ion-button color="warning" (click)="goToSearchPlayers()">
+        Buscar Jugadores
+      </ion-button>
     </div>
   </div>
 
-  <div class="ion-margin-bottom" *ngIf="authService.isUserAdmin()">
-    <hr style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;" />
-    <h3 style="margin-left: 5px; font-size: 0.9rem; color: var(--ion-color-danger); text-transform: uppercase;">Panel de Administrador</h3>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-      
-      <ion-button color="danger" (click)="goToCreateNewsCorba()">
-        Publicar Noticia CORBA
-      </ion-button>
+  <hr class="section-divider" />
 
-    </div>
-  </div>
-
-  <hr style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;" />
-
-  <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+  <div class="logout-container">
     <ion-button color="dark" fill="outline" (click)="logout()">
       Cerrar Sesión
     </ion-button>
   </div>
-
-  </ion-content>
+</ion-content>

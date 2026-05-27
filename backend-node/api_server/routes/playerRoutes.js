@@ -22,7 +22,7 @@ router.get('/:id', playerController.getPlayer);
 router.post('/', authController.protect, playerController.createPlayer);
 
 // Añadir comentarios con valoración (0-5 estrellas)
-router.post('/:id/comments', authController.protect, playerController.addComment);
+router.post('/:id/comments',  playerController.addComment);
 router.get('/:id/comments', playerController.getCommentsByPlayer); 
 // =======================================================
 // 👑 ACCESO DE ADMINISTRADOR (Solo rol 'admin')

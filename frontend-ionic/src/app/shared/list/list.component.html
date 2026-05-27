@@ -1,0 +1,70 @@
+<div class="list-wrap">
+  <ion-item
+    *ngFor="let item of items"
+    lines="none"
+    class="player-item"
+    button="true"
+    (click)="selectItem(item)"
+  >
+    <ng-container *ngIf="type === 'players' || type === 'external'">
+      <div slot="start" class="avatar">
+        <img
+          *ngIf="item.imageUrl || item.photo; else initials"
+          [src]="item.imageUrl || item.photo"
+          [alt]="item.name"
+          (error)="$event.target.style.display='none'"
+        />
+        <ng-template #initials>{{ getInitials(item.name) }}</ng-template>
+      </div>
+
+      <ion-label class="player-info">
+        <h2>{{ item.name }}</h2>
+        <p>
+          {{ item.team }}
+          <span class="dot" aria-hidden="true"></span>
+          {{ item.league }}
+        </p>
+      </ion-label>
+
+      <span
+        *ngIf="item.position"
+        slot="end"
+        class="badge"
+        [ngClass]="item.position | lowercase"
+      >
+        {{ item.position }}
+      </span>
+    </ng-container>
+
+    <ng-container *ngIf="type === 'comments'">
+      <ion-icon name="chatbubble-ellipses-outline" slot="start" color="primary" />
+      <ion-label class="ion-text-wrap">
+        <h3>{{ item.username || 'Usuario anónimo' }}</h3>
+        <p class="comment-text">"{{ item.text }}"</p>
+        <div class="stars" *ngIf="item.rating">
+          <ion-icon
+            name="star"
+            color="warning"
+            *ngFor="let s of getStars(item.rating)"
+          />
+        </div>
+      </ion-label>
+    </ng-container>
+
+      <div slot="end" *ngIf="isAdmin" style="display: flex; gap: 5px;">
+        <ion-button fill="clear" color="primary" (click)="edit.emit(item)">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="clear" color="danger" (click)="delete.emit(item)">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </div>
+      
+  </ion-item>
+</div>
+
+<div *ngIf="!items?.length" class="empty-state">
+  <ion-icon name="folder-open-outline" />
+  <p>No hay elementos disponibles.</p>
+</div>

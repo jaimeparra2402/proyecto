@@ -1,29 +1,58 @@
-#container {
-  text-align: center;
+// Caja de saludo superior
+.user-greeting {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: var(--ion-color-light, #f4f5f8);
+  border-radius: 8px;
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: var(--ion-color-medium, #666);
+  }
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+// Títulos de secciones
+.section-title {
+  margin: 20px 0 10px 5px;
+  font-size: 0.85rem;
+  color: var(--ion-color-step-550, gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.admin-title {
+    color: var(--ion-color-danger, #eb445a);
+  }
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
 
-  color: #8c8c8c;
-
-  margin: 0;
+  ion-button {
+    --border-radius: 6px;
+    font-weight: 500;
+  }
 }
 
+.section-divider {
+  border: 0;
+  border-top: 1px solid var(--ion-color-step-200, #ccc);
+  margin: 25px 0;
+}
 
-
-#container a {
-  text-decoration: none;
+.logout-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }

@@ -1,23 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PlayerFactoryService } from '../../core/services/player-factory.service';
-import { AuthService } from '../../core/services/auth.service'; // 👈 Tu servicio con el rol
+import { AuthService } from '../../core/services/auth.service';
 import { ApiToggleComponent } from '../../shared/api-toggle/api-toggle.component';
 import {
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonLabel,
-  IonSearchbar,
   IonButton,
-  IonCard,
-  IonCardContent,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -33,41 +25,20 @@ import {
     IonHeader,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonAvatar,
-    IonLabel,
-    IonSearchbar,
     IonButton,
-    IonCard,
-    IonCardContent,
   ],
 })
-export class HomePage implements OnInit {
-  private playerFactory = inject(PlayerFactoryService);
-  public authService = inject(AuthService); // 👈 DEBE SER PUBLIC PARA EL HTML
+export class HomePage {
+  public authService = inject(AuthService);
   private router = inject(Router);
 
-  players: any[] = [];
-  searchName = '';
-  searchTeam = '';
-
-  ngOnInit() {
-    this.loadPlayers();
-  }
-
-  loadPlayers() {
-    const filters: any = {};
-    if (this.searchName) filters.name = this.searchName;
-    if (this.searchTeam) filters.team = this.searchTeam;
-
-    this.playerFactory
-      .getService()
-      .getPlayers(filters)
-      .subscribe({
-        next: (data) => this.players = data,
-        error: (err) => console.error(err),
-      });
+  // Extrae el nombre de usuario basándose en el email actual de Firebase
+  getUsername(): string {
+    const email = this.authService.currentUser()?.email;
+    if (!email) return 'Usuario';
+    const namePart = email.split('@')[0];
+    // Formatear la primera letra en mayúscula para que quede más estético
+    return namePart.charAt(0).toUpperCase() + namePart.slice(1);
   }
 
   // NAVEGACIÓN PÚBLICA DE USUARIOS
@@ -87,9 +58,12 @@ export class HomePage implements OnInit {
     this.router.navigate(['/view-news-corba']);
   }
 
-  // NAVEGACIÓN EXCLUSIVA ADMIN
-  goToCreateNewsCorba() {
-    this.router.navigate(['/create-news-corba']);
+  goToPlayerList() {
+    this.router.navigate(['/player-list']);
+  }
+
+  goToSearchPlayers() {
+    this.router.navigate(['/player-search']);
   }
 
   async logout() {

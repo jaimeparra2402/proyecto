@@ -1,0 +1,17 @@
+.search-card {
+  border-radius: 16px;
+}
+
+.custom-select {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.hint-text {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

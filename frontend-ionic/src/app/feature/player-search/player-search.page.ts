@@ -1,22 +1,27 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PlayerFactoryService } from '../../core/services/player-factory.service';
+import { NodePlayerService } from '../../core/services/node-player.service';
 import {
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonLabel,
-  IonSearchbar,
+  IonButtons,
+  IonBackButton,
   IonCard,
   IonCardContent,
-  IonButtons, 
-  IonBackButton, 
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption,
+  IonSpinner,
+  IonButton,
+  IonIcon,
 } from '@ionic/angular/standalone';
+import { ListComponent } from '../../shared/list/list.component';
+import { LEAGUES, SEASONS } from '../../core/constants/leagues.constants';
 
 @Component({
   selector: 'app-player-search',
@@ -30,42 +35,68 @@ import {
     IonHeader,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonAvatar,
-    IonLabel,
-    IonSearchbar,
+    IonButtons,
+    IonBackButton,
     IonCard,
     IonCardContent,
-    IonButtons, 
-    IonBackButton, 
+    IonSearchbar,
+    IonSelect,
+    IonSelectOption,
+    IonSpinner,
+    IonButton,
+    IonIcon,
+    ListComponent,
   ],
 })
 export class PlayerSearchPage {
-  private playerFactory = inject(PlayerFactoryService);
+  private playerService = inject(NodePlayerService);
+  private router = inject(Router);
 
   players: any[] = [];
+  loading = false;
+  searched = false;
+
   searchName = '';
-  searchTeam = '';
+  searchLeague = '';
+  searchSeason = '';
 
-  loadPlayers() {
-    if (!this.searchName && !this.searchTeam) {
-      this.players = [];
-      return;
+  leagues = LEAGUES;
+  seasons = SEASONS;
+
+  get formValid(): boolean {
+    return (
+      this.searchName.length >= 3 && !!this.searchLeague && !!this.searchSeason
+    );
+  }
+
+  goToDetail(player: any) {
+    const playerId = player._id || player.id; // Controla ambos formatos de ID
+    if (playerId) {
+      this.router.navigate(['/player-detail', playerId]);
     }
+  }
 
-    const filters: any = {};
-    if (this.searchName) filters.name = this.searchName;
-    if (this.searchTeam) filters.team = this.searchTeam;
+  search() {
+    if (!this.formValid) return;
 
-    this.playerFactory
-      .getService()
-      .getPlayers(filters)
+    this.loading = true;
+    this.searched = true;
+
+    this.playerService
+      .searchExternalPlayer({
+        search: this.searchName,
+        league: this.searchLeague,
+        season: this.searchSeason,
+      })
       .subscribe({
         next: (data) => {
-          this.players = data;
+          this.players = data.players || data.data || data || [];
+          this.loading = false;
         },
-        error: (err) => console.error(err),
+        error: (err) => {
+          console.error(err);
+          this.loading = false;
+        },
       });
   }
 }

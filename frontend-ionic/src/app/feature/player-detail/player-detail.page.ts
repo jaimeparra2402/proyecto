@@ -13,19 +13,21 @@ import {
   IonBackButton,
   IonItem,
   IonLabel,
-  IonAvatar,
   IonButton,
   IonInput,
   IonList,
   IonCard,
   IonCardContent,
-  IonCardHeader,   // 👈 AÑADIDO
-  IonCardTitle,    // 👈 AÑADIDO
-  IonCardSubtitle, // 👈 AÑADIDO
-  IonTextarea,     // 👈 AÑADIDO
-  IonSelect,       // 👈 AÑADIDO
-  IonSelectOption, // 👈 AÑADIDO
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonTextarea,
+  IonSelect,
+  IonSelectOption,
+  IonIcon
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { star, starOutline, chatbubbleEllipsesOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-player-detail',
@@ -43,18 +45,18 @@ import {
     IonBackButton,
     IonItem,
     IonLabel,
-    IonAvatar,
     IonButton,
     IonInput,
     IonList,
     IonCard,
     IonCardContent,
-    IonCardHeader,   // 👈 REGISTRADO
-    IonCardTitle,    // 👈 REGISTRADO
-    IonCardSubtitle, // 👈 REGISTRADO
-    IonTextarea,     // 👈 REGISTRADO
-    IonSelect,       // 👈 REGISTRADO
-    IonSelectOption, // 👈 REGISTRADO
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonTextarea,
+    IonSelect,
+    IonSelectOption,
+    IonIcon
   ],
 })
 export class PlayerDetailPage implements OnInit {
@@ -67,17 +69,23 @@ export class PlayerDetailPage implements OnInit {
   player: any = null;
   comments: any[] = [];
   
+  // Campos del formulario requeridos
   author: string = '';
   commentText: string = '';
   rating: number = 5;
 
+  constructor() {
+    addIcons({ star, starOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline });
+  }
+
   ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
-      this.playerId = params['id'];
-      if (this.playerId) {
-        this.loadPlayerDetails();
-      }
-    });
+    this.playerId = this.route.snapshot.paramMap.get('id') || '';
+    if (this.playerId) {
+      this.loadPlayerDetails();
+    } else {
+      console.error('No se encontró el ID del jugador en la ruta');
+      this.router.navigate(['/home']);
+    }
   }
 
   loadPlayerDetails() {
@@ -85,21 +93,22 @@ export class PlayerDetailPage implements OnInit {
       .getService()
       .getPlayerById(this.playerId)
       .subscribe({
-        next: (data) => {
-          this.player = data;
-          this.comments = data.comments || [];
+        next: (data: any) => {
+          this.player = data?.data?.player || data; // Maneja la envoltura de respuesta si existe
+          this.comments = this.player?.comments || [];
         },
         error: (err) => console.error('Error al cargar detalle:', err),
       });
   }
 
   sendComment() {
-    if (!this.commentText.trim()) return;
+    // Validación de texto vacío y límite de 1000 caracteres exigido
+    if (!this.commentText.trim() || this.commentText.length > 1000) return;
 
     const commentData = {
-      text: this.commentText,
-      author: this.author || 'Anónimo',
-      rating: this.rating,
+      author: this.author.trim() || 'Anónimo',
+      text: this.commentText.trim(),
+      rating: Number(this.rating),
       createdAt: new Date(),
     };
 
@@ -110,28 +119,25 @@ export class PlayerDetailPage implements OnInit {
         next: () => {
           this.commentText = '';
           this.author = '';
-          this.loadPlayerDetails();
+          this.rating = 5;
+          this.loadPlayerDetails(); // Recarga la ficha y la lista de comentarios
         },
         error: (err) => console.error('Error al añadir comentario:', err),
       });
   }
 
   removeComment(commentId: string) {
-    this.comments = this.comments.filter(c => c._id !== commentId && c.id !== commentId);
-    if (this.player) {
-      this.player.comments = this.comments;
-    }
     this.playerFactory
       .getService()
-      .addComment(this.playerId, this.player)
+      .deleteComment(this.playerId, commentId)
       .subscribe({
         next: () => this.loadPlayerDetails(),
-        error: () => this.loadPlayerDetails(),
+        error: (err) => console.error('Error al eliminar comentario:', err),
       });
   }
 
   editPlayer() {
-    this.router.navigate(['/edit-player'], { queryParams: { id: this.playerId } });
+    this.router.navigate(['/edit-player', this.playerId]);
   }
 
   deletePlayer() {

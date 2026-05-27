@@ -1,18 +1,14 @@
 const Player = require('../models/Player');
 
-// 1. LISTADO COMPLETO Y BÚSQUEDA CON FILTROS (Público)
-// Soporta filtrar por ?name=... & team=... & desdeFecha=YYYY-MM-DD
 exports.getAllPlayers = async (req, res) => {
   try {
     const { name, team, desdeFecha } = req.query;
     let query = {};
 
-    // Filtro por nombre (búsqueda parcial, insensible a mayúsculas)
     if (name) {
       query.name = { $regex: name, $options: 'i' };
     }
 
-    // Filtro por equipo o liga
     if (team) {
       query.$or = [
         { team: { $regex: team, $options: 'i' } },
@@ -20,7 +16,6 @@ exports.getAllPlayers = async (req, res) => {
       ];
     }
 
-    // Filtro por fecha de alta en el sistema
     if (desdeFecha) {
       query.createdAt = { $gte: new Date(desdeFecha) };
     }
@@ -37,7 +32,6 @@ exports.getAllPlayers = async (req, res) => {
   }
 };
 
-// 2. OBTENER UN JUGADOR POR ID (Público)
 exports.getPlayer = async (req, res) => {
   try {
     const player = await Player.findById(req.params.id);
@@ -49,7 +43,6 @@ exports.getPlayer = async (req, res) => {
   }
 };
 
-// 3. INSERTAR JUGADOR desde Formulario o API Externa (Registrado)
 exports.createPlayer = async (req, res) => {
   try {
     const newPlayer = await Player.create(req.body);
@@ -59,7 +52,6 @@ exports.createPlayer = async (req, res) => {
   }
 };
 
-// 4. EDITAR JUGADOR (Solo Administrador)
 exports.updatePlayer = async (req, res) => {
   try {
     const player = await Player.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
@@ -71,7 +63,6 @@ exports.updatePlayer = async (req, res) => {
   }
 };
 
-// 5. ELIMINAR JUGADOR (Solo Administrador)
 exports.deletePlayer = async (req, res) => {
   try {
     const player = await Player.findByIdAndDelete(req.params.id);
@@ -83,22 +74,19 @@ exports.deletePlayer = async (req, res) => {
   }
 };
 
-// 6. AÑADIR COMENTARIO CON VALORACIÓN (Registrado)
 exports.addComment = async (req, res) => {
   try {
-    // 1. Recogemos también la latitud y longitud que mandará Ionic al comentar
-    const { text, rating, latitude, longitude } = req.body; 
+    const { text, rating, latitude, longitude, username } = req.body; 
     const player = await Player.findById(req.params.id);
     
     if (!player) return res.status(404).json({ status: 'fail', message: 'Jugador no encontrado' });
 
     const newComment = {
-      userId: req.user.id,
-      author: req.user.username,
+      author: username || 'Anónimo',
       text,
       rating,
-      latitude,   // 👈 ¡Lo guardamos en el subdocumento del comentario!
-      longitude   // 👈 ¡Lo guardamos en el subdocumento del comentario!
+      latitude,   
+      longitude   
     };
 
     player.comments.push(newComment);
@@ -112,10 +100,8 @@ exports.addComment = async (req, res) => {
 
 exports.getCommentsByPlayer = async (req, res) => {
   try {
-    // 1. Buscamos al jugador por su ID usando el modelo Player (que ya lo tienes importado)
     const player = await Player.findById(req.params.id);
 
-    // 2. Si el jugador no existe, avisamos
     if (!player) {
       return res.status(404).json({
         status: 'fail',
@@ -123,11 +109,10 @@ exports.getCommentsByPlayer = async (req, res) => {
       });
     }
 
-    // 3. Devolvemos DIRECTAMENTE el array de comentarios que tiene guardado dentro
     res.status(200).json({
       status: 'success',
       results: player.comments.length,
-      data: player.comments // 👈 Aquí van los comentarios de Haaland ("hola", "mal", etc.)
+      data: player.comments 
     });
 
   } catch (error) {
@@ -138,7 +123,6 @@ exports.getCommentsByPlayer = async (req, res) => {
   }
 };
 
-// 7. BORRAR UN COMENTARIO ESPECÍFICO (Solo Administrador)
 exports.deleteComment = async (req, res) => {
   try {
     const { playerId, commentId } = req.params;
@@ -146,7 +130,6 @@ exports.deleteComment = async (req, res) => {
     const player = await Player.findById(playerId);
     if (!player) return res.status(404).json({ status: 'fail', message: 'Jugador no encontrado' });
 
-    // Removemos el comentario del array
     player.comments.id(commentId).deleteOne();
     await player.save();
 

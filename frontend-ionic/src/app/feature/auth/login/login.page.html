@@ -8,35 +8,68 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item class="ion-margin-bottom">
-    <ion-input 
-      label="Correo" 
-      labelPlacement="floating" 
-      type="email" 
-      [(ngModel)]="email"
-      data-testid="login-email">
-    </ion-input>
-  </ion-item>
 
-  <ion-item class="ion-margin-bottom">
-    <ion-input 
-      label="Contraseña" 
-      labelPlacement="floating" 
-      type="password" 
-      [(ngModel)]="password"
-      data-testid="login-password">
-    </ion-input>
-  </ion-item>
+  <div class="auth-header">
+    <h2>Bienvenido de nuevo</h2>
+    <p>Inicia sesión para continuar</p>
+  </div>
 
-  <p *ngIf="errorMessage" style="color: var(--ion-color-danger); margin-left: 10px;">
-    {{ errorMessage }}
-  </p>
-  <ion-button expand="block" fill="clear" (click)="goToRegister()" class="ion-margin-top">
-    ¿No tienes cuenta? Regístrate aquí
-  </ion-button>
-  
-  <ion-button expand="block" (click)="onLogin()" class="ion-margin-top" data-testid="login-btn">
-    Ingresar
-  </ion-button>
+  <ion-card class="auth-card">
+    <ion-card-content>
+
+      <ion-item [class.item-error]="emailTouched && !email">
+        <ion-input
+          label="Correo electrónico"
+          labelPlacement="floating"
+          type="email"
+          [(ngModel)]="email"
+          (ionBlur)="emailTouched = true"
+          autocomplete="email"
+          data-testid="login-email">
+        </ion-input>
+      </ion-item>
+      <p class="field-error" *ngIf="emailTouched && !email">El correo es obligatorio</p>
+
+      <ion-item class="ion-margin-top" [class.item-error]="passwordTouched && !password">
+        <ion-input
+          label="Contraseña"
+          labelPlacement="floating"
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="password"
+          (ionBlur)="passwordTouched = true"
+          autocomplete="current-password"
+          data-testid="login-password">
+        </ion-input>
+        <ion-button slot="end" fill="clear" (click)="showPassword = !showPassword" tabindex="-1">
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <p class="field-error" *ngIf="passwordTouched && !password">La contraseña es obligatoria</p>
+
+      <div class="error-message" *ngIf="errorMessage">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        {{ errorMessage }}
+      </div>
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top main-btn"
+        [disabled]="loading"
+        (click)="onLogin()"
+        data-testid="login-btn">
+        <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
+        {{ loading ? 'Entrando...' : 'Ingresar' }}
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="clear"
+        class="secondary-btn"
+        (click)="goToRegister()">
+        ¿No tienes cuenta? Regístrate aquí
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>

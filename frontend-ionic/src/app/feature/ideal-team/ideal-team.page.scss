@@ -1,0 +1,92 @@
+.main-loader {
+  margin-top: 2rem;
+  p {
+    color: var(--ion-color-step-600);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.ai-container {
+  margin-top: 1.5rem;
+
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin-left: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .formation-header {
+    .formation-badge {
+      font-size: 1.1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 10px rgba(var(--ion-color-success-rgb), 0.3);
+    }
+  }
+
+  .player-card {
+    margin: 0 0 0.75rem 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid var(--ion-color-secondary);
+
+    .player-content {
+      padding: 0.85rem 1rem;
+    }
+
+    .player-info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .player-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .player-name {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+    }
+
+    .position-badge {
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .player-reason {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      color: var(--ion-color-step-700);
+    }
+  }
+
+  .tactical-card {
+    margin: 0 0 1.5rem 0;
+    border-radius: 12px;
+    background: linear-gradient(to bottom, var(--ion-color-light), #ffffff);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    .tactical-text {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--ion-color-step-800);
+      text-align: justify;
+    }
+  }
+}

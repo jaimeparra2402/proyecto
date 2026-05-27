@@ -180,7 +180,6 @@ const swaggerSpec = {
       post: {
         tags: ['Jugadores'],
         summary: 'Añadir un comentario y valoración (0-5 estrellas) a un jugador',
-        security: [{ bearerAuth: [] }],
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' }, description: 'ID del jugador a comentar' }],
         requestBody: {
           required: true,
@@ -222,7 +221,6 @@ const swaggerSpec = {
       get: {
         tags: ['Externa'],
         summary: 'Buscar futbolistas reales en la API Externa (API-Football)',
-        security: [{ bearerAuth: [] }],
         parameters: [
           { in: 'query', name: 'search', required: true, schema: { type: 'string' }, description: 'Nombre del futbolista (Mínimo 3 letras)' },
           { in: 'query', name: 'league', schema: { type: 'string' } },

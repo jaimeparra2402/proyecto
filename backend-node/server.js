@@ -5,6 +5,20 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const connectDB = require('./api_server/models/db');
 
+// 🆕 PASO NUEVO: Importar e inicializar Firebase Admin SDK
+const admin = require('firebase-admin');
+try {
+  // Cargamos el archivo JSON de credenciales de la raíz del proyecto
+  const serviceAccount = require('./firebase-service-account.json');
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+  console.log('Firebase Admin SDK inicializado correctamente');
+} catch (error) {
+  console.error('Error crítico al inicializar Firebase Admin:', error.message);
+}
+
 const app = express();
 
 app.use(cors({
@@ -45,7 +59,7 @@ try {
 }
 
 app.use((err, req, res, next) => {
-  console.error("💥 Error cazado en el servidor:", err.stack);
+  console.error("Error cazado en el servidor:", err.stack);
 
   if (err.code === 11000) {
     return res.status(400).json({

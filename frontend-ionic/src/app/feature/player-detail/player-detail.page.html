@@ -8,88 +8,120 @@
 </ion-header>
 
 <ion-content class="ion-padding" *ngIf="player">
-  <ion-card>
-    <img
-      [src]="player.image || 'assets/placeholder-player.png'"
-      style="width: 100%; height: 250px; object-fit: cover"
-    />
+  
+  <ion-card class="player-detail-card">
+    <div class="avatar-banner">
+      <img
+        [src]="player.imageUrl || './assets/placeholder-player.png'"
+        alt="Imagen de {{ player.name }}"
+      />
+    </div>
     <ion-card-header>
-      <ion-card-title>{{ player.name }}</ion-card-title>
-      <ion-card-subtitle>{{ player.team }} - {{ player.league }}</ion-card-subtitle>
+      <ion-card-title class="player-name">{{ player.name }}</ion-card-title>
+      <ion-card-subtitle class="player-team">{{ player.team }} - {{ player.league }}</ion-card-subtitle>
     </ion-card-header>
+    
     <ion-card-content>
-      <p><strong>Posición:</strong> {{ player.position || 'No definida' }}</p>
-      <p><strong>Edad:</strong> {{ player.age || 'Desconocida' }}</p>
+      <p class="player-info"><strong>Posición:</strong> {{ player.position || 'No definida' }}</p>
+      <p class="player-info" *ngIf="player.age"><strong>Edad:</strong> {{ player.age }} años</p>
+      
+      <div class="stats-section" *ngIf="player.stats">
+        <h4 class="stats-title">Estadísticas de la Temporada</h4>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-value">{{ player.stats.matchesPlayed || 0 }}</span>
+            <span class="stat-label">Partidos</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-value goals">{{ player.stats.goals || 0 }}</span>
+            <span class="stat-label">Goles</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-value assists">{{ player.stats.assists || 0 }}</span>
+            <span class="stat-label">Asistencias</span>
+          </div>
+        </div>
+      </div>
+      
     </ion-card-content>
   </ion-card>
 
-  <div *ngIf="authService.isUserAdmin()" class="ion-padding">
-    <ion-button color="warning" (click)="editPlayer()">Editar Datos</ion-button>
-    <ion-button color="danger" (click)="deletePlayer()">Eliminar Jugador</ion-button>
+  <div *ngIf="authService.isSystemAdmin()" class="admin-actions-container">
+    <ion-button expand="block" color="warning" class="action-btn" (click)="editPlayer()">Editar Datos</ion-button>
+    <ion-button expand="block" color="danger" class="action-btn" (click)="deletePlayer()">Eliminar Jugador</ion-button>
   </div>
 
-  <h3 class="ion-margin-start">Comentarios y Valoraciones</h3>
+  <h3 class="section-title">Comentarios y Valoraciones</h3>
 
-  <ion-list lines="inset" class="ion-margin-bottom">
-    <ion-item *ngFor="let c of comments">
+  <ion-list lines="inset" class="comments-list">
+    <ion-item *ngFor="let c of comments" class="comment-item">
+      <ion-icon name="chatbubble-ellipses-outline" slot="start" color="medium"></ion-icon>
       <ion-label class="ion-text-wrap">
-        <h3><strong>{{ c.author }}</strong> — {{ c.rating }} Estrellas</h3>
-        <p>{{ c.text }}</p>
-        <small *ngIf="c.latitude" style="color: gray">
-          {{ c.latitude | number:'1.2-2' }}, {{ c.longitude | number:'1.2-2' }}
-        </small>
+        <h3 class="comment-author">
+          {{ c.author || 'Anónimo' }} 
+          <span class="comment-stars">
+            ★ {{ c.rating }}/5
+          </span>
+        </h3>
+        <p class="comment-text">"{{ c.text }}"</p>
       </ion-label>
+      
       <ion-button
         slot="end"
         color="danger"
         fill="clear"
-        *ngIf="authService.isUserAdmin()"
+        *ngIf="authService.isSystemAdmin()"
         (click)="removeComment(c._id || c.id)"
       >
         Borrar
       </ion-button>
     </ion-item>
-    <p *ngIf="!comments || comments.length === 0" class="ion-margin-start">
-      No hay comentarios aún. ¡Sé el primero!
+
+    <p *ngIf="!comments || comments.length === 0" class="no-comments-msg">
+      No hay comentarios aún. ¡Sé el primero en opinar!
     </p>
   </ion-list>
 
-  <ion-card>
+  <ion-card class="add-comment-card">
     <ion-card-header>
-      <ion-card-title>Añadir Comentario</ion-card-title>
+      <ion-card-title class="form-title">Añadir Comentario</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-item class="ion-margin-bottom">
+      <ion-item class="form-item">
         <ion-input
-          label="Tu Nombre"
+          label="Autor"
           labelPlacement="floating"
           type="text"
+          placeholder="Tu nombre (opcional)"
           [(ngModel)]="author"
         ></ion-input>
       </ion-item>
 
-      <ion-item class="ion-margin-bottom">
+      <ion-item class="form-item">
         <ion-textarea
-          label="Comentario (Máx 1000 car.)"
+          label="Comentario"
           labelPlacement="floating"
+          placeholder="¿Qué opinas de este jugador?"
           [(ngModel)]="commentText"
           rows="3"
+          maxlength="1000"
+          [counter]="true"
         ></ion-textarea>
       </ion-item>
 
-      <ion-item class="ion-margin-bottom">
-        <ion-select label="Valoración" [(ngModel)]="rating">
-          <ion-select-option [value]="5">5 Estrellas</ion-select-option>
-          <ion-select-option [value]="4">4 Estrellas</ion-select-option>
-          <ion-select-option [value]="3">3 Estrellas</ion-select-option>
-          <ion-select-option [value]="2">2 Estrellas</ion-select-option>
-          <ion-select-option [value]="1">1 Estrella</ion-select-option>
-          <ion-select-option [value]="0">0 Estrellas</ion-select-option>
+      <ion-item class="form-item">
+        <ion-select label="Valoración (Estrellas)" [(ngModel)]="rating" interface="popover">
+          <ion-select-option [value]="5">⭐⭐⭐⭐⭐ (5 Estrellas)</ion-select-option>
+          <ion-select-option [value]="4">⭐⭐⭐⭐ (4 Estrellas)</ion-select-option>
+          <ion-select-option [value]="3">⭐⭐⭐ (3 Estrellas)</ion-select-option>
+          <ion-select-option [value]="2">⭐⭐ (2 Estrellas)</ion-select-option>
+          <ion-select-option [value]="1">⭐ (1 Estrella)</ion-select-option>
+          <ion-select-option [value]="0">❌ 0 Estrellas</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <ion-button expand="block" (click)="sendComment()">
-        Publicar Comentario con Geo
+      <ion-button expand="block" class="ion-margin-top" [disabled]="!commentText.trim()" (click)="sendComment()">
+        Publicar Opinión
       </ion-button>
     </ion-card-content>
   </ion-card>
