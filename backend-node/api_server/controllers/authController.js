@@ -29,11 +29,8 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    console.log("🎟️ Token recibido en el servidor:", token);
     if (process.env.JWT_SECRET) {
-      console.log("🔑 Token esperado (.env):", process.env.JWT_SECRET);
       if (token.trim() === process.env.JWT_SECRET.trim()) {
-        console.log("🟢 ¡Bypass de desarrollo activado con éxito! Entrando como Admin.");
         req.user = {
           id: "mock_admin_123",
           username: "admin_tester@proyecto.com",

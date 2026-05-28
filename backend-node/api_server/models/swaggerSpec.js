@@ -241,36 +241,6 @@ const swaggerSpec = {
         }
       }
     },
-    '/api/external/import': {
-      post: {
-        tags: ['Externa'],
-        summary: 'Importar uno o varios jugadores seleccionados a la base de datos local',
-        security: [{ bearerAuth: [] }],
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['players'],
-                properties: {
-                  players: { 
-                    type: 'array', 
-                    items: { type: 'object' }
-                  },
-                  latitude: { type: 'number' },
-                  longitude: { type: 'number' }
-                }
-              }
-            }
-          }
-        },
-        responses: {
-          201: { description: 'Jugadores clonados e insertados con éxito en MongoDB local' },
-          400: { description: 'Estructura o array de jugadores erróneo' }
-        }
-      }
-    },
     '/api/external/equipo-ideal': {
       get: {
         tags: ['IA (Inteligencia Artificial)'],

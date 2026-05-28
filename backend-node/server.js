@@ -5,10 +5,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const connectDB = require('./api_server/models/db');
 
-// 🆕 PASO NUEVO: Importar e inicializar Firebase Admin SDK
 const admin = require('firebase-admin');
 try {
-  // Cargamos el archivo JSON de credenciales de la raíz del proyecto
   const serviceAccount = require('./firebase-service-account.json');
 
   admin.initializeApp({

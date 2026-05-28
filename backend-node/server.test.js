@@ -98,17 +98,6 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
       expect([200, 400, 404]).toContain(res.statusCode); // Depende de la API externa en el test
     });
 
-    it('POST /api/external/import debe permitir importación masiva', async () => {
-      const res = await request(app)
-        .post('/api/external/import')
-        .set('Authorization', `Bearer ${BYPASS_TOKEN}`)
-        .send({
-          players: [{ name: 'Sadio Mané', team: 'Al Nassr', position: 'Attacker' }],
-          latitude: 0,
-          longitude: 0
-        });
-      expect([201, 200, 400]).toContain(res.statusCode);
-    });
 
     it('GET /api/external/equipo-ideal debe invocar al LLM (Gemini/Groq)', async () => {
       const res = await request(app)
