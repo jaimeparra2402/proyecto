@@ -1,8 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PlayerFactoryService } from '../../core/services/player-factory.service';
-import { AuthService } from '../../core/services/auth.service'; // 👈 Importamos el servicio de autenticación
+import { AuthService } from '../../core/services/auth.service';
 import { ListComponent } from '../../shared/list/list.component';
+import { Router } from '@angular/router';
 import {
   IonContent,
   IonHeader,
@@ -10,6 +12,9 @@ import {
   IonToolbar,
   IonButtons,
   IonBackButton,
+  IonInput,
+  IonButton,
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -17,8 +22,13 @@ import {
   chevronBackOutline,
   createOutline,
   trashOutline,
+  searchOutline,
+  refreshOutline,
+  personOutline,
+  shieldOutline,
+  calendarClearOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-player-list',
@@ -27,6 +37,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ListComponent,
     IonContent,
     IonHeader,
@@ -34,22 +45,34 @@ import { Router } from '@angular/router';
     IonToolbar,
     IonButtons,
     IonBackButton,
+    IonInput,
+    IonButton,
+    IonIcon
   ],
 })
 export class PlayerListPage implements OnInit {
   private playerFactory = inject(PlayerFactoryService);
-  public authService = inject(AuthService); // 👈 Inyectamos como público para usarlo en el HTML
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   players: any[] = [];
 
+  searchName: string = '';
+  searchTeam: string = '';
+  searchDate: string = '';
+
   constructor() {
-    // Registramos los iconos de edición y eliminación que usará el listado
     addIcons({
       'arrow-back': arrowBackOutline,
       'chevron-back': chevronBackOutline,
       'create-outline': createOutline,
       'trash-outline': trashOutline,
+      'search-outline': searchOutline,
+      'refresh-outline': refreshOutline,
+      'person-outline': personOutline,
+      'shield-outline': shieldOutline,
+      'calendar-clear-outline': calendarClearOutline,
+      'alert-circle-outline': alertCircleOutline
     });
   }
 
@@ -58,58 +81,59 @@ export class PlayerListPage implements OnInit {
   }
 
   loadPlayers() {
+    const filters: any = {};
+    if (this.searchName.trim()) filters.name = this.searchName.trim();
+    if (this.searchTeam.trim()) filters.team = this.searchTeam.trim();
+    if (this.searchDate) filters.desdeFecha = this.searchDate;
+
     this.playerFactory
       .getService()
-      .getPlayers()
+      .getPlayers(filters)
       .subscribe({
         next: (response: any) => {
-          console.log('¡RESPUESTA CRUDA DEL BACKEND!', response);
-
-          // Extraemos los jugadores de la respuesta según tu estructura de Node
           const rawPlayers = response?.data?.players || response || [];
-
-          // Mapeamos los campos para asegurarnos de que el listado compartido los entienda perfectamente
           this.players = rawPlayers.map((player: any) => ({
             ...player,
-            // Si el backend trae 'image', el componente compartido usará 'imageUrl'
-            imageUrl:
-              player.image ||
-              player.imageUrl ||
-              'assets/placeholder-player.png',
+            imageUrl: player.image || player.imageUrl || 'assets/placeholder-player.png',
           }));
-
-          console.log('Datos limpios enviados a la lista:', this.players);
         },
-        error: (err) => console.error('Error al cargar jugadores:', err),
+        error: (err) => console.error('Error al cargar los jugadores:', err),
       });
   }
 
+  applyFilters() {
+    this.loadPlayers();
+  }
+
+  clearFilters() {
+    this.searchName = '';
+    this.searchTeam = '';
+    this.searchDate = '';
+    this.loadPlayers();
+  }
+
   goToDetail(player: any) {
-    const playerId = player._id || player.id; // Controla ambos formatos de ID
+    const playerId = player._id || player.id;
     if (playerId) {
       this.router.navigate(['/player-detail', playerId]);
     }
   }
-  // ACCIONES EXCLUSIVAS DEL ADMINISTRADOR
 
   onEditPlayer(player: any) {
-    console.log('Editar jugador:', player);
-    // Aquí puedes redirigir al formulario de edición pasando el ID, ej:
-    // this.router.navigate(['/edit-player', player._id || player.id]);
+    const id = player._id || player.id;
+    if (id) {
+      this.router.navigate(['/edit-player', id]);
+    }
   }
 
   onDeletePlayer(player: any) {
-    console.log('Eliminar jugador:', player);
     const id = player._id || player.id;
-
-    // Llamada a tu servicio factory/estrategia para eliminar de la base de datos
     this.playerFactory
       .getService()
       .deletePlayer(id)
       .subscribe({
         next: () => {
-          console.log('Jugador eliminado con éxito');
-          this.loadPlayers(); // Recargamos la lista automáticamente
+          this.loadPlayers();
         },
         error: (err) => console.error('Error al eliminar el jugador:', err),
       });

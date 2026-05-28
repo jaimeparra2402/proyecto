@@ -1,0 +1,44 @@
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+
+  .preview-img {
+    max-height: 180px;
+    border-radius: 8px;
+    border: 1px solid var(--ion-color-step-200, #ddd);
+  }
+
+  .delete-btn-wrapper {
+    margin-top: 8px;
+  }
+}
+
+.section-title {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: var(--ion-color-dark);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.map-box {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid var(--ion-color-step-300, #ccc);
+  z-index: 1;
+}
+
+.coordinates-text {
+  font-size: 0.85em;
+  color: var(--ion-color-step-600, gray);
+  font-family: monospace;
+}

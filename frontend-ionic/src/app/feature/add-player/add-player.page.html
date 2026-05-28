@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
+      <ion-back-button defaultHref="/player-list"></ion-back-button>
     </ion-buttons>
     <ion-title>Añadir Jugador</ion-title>
   </ion-toolbar>
@@ -11,37 +11,72 @@
   <ion-card>
     <ion-card-content>
       <ion-item class="ion-margin-bottom">
-        <ion-input label="Nombre del Jugador" labelPlacement="floating" type="text" [(ngModel)]="name"></ion-input>
+        <ion-input label="Nombre del Jugador *" labelPlacement="floating" type="text" [(ngModel)]="name"></ion-input>
       </ion-item>
 
       <ion-item class="ion-margin-bottom">
-        <ion-input label="Equipo" labelPlacement="floating" type="text" [(ngModel)]="team"></ion-input>
+        <ion-input label="Equipo *" labelPlacement="floating" type="text" [(ngModel)]="team"></ion-input>
       </ion-item>
 
       <ion-item class="ion-margin-bottom">
-        <ion-input label="Liga" labelPlacement="floating" type="text" [(ngModel)]="league"></ion-input>
+        <ion-select label="Liga *" labelPlacement="floating" placeholder="Selecciona una liga" [(ngModel)]="league">
+          <ion-select-option *ngFor="let l of leagues" [value]="l.value">
+            {{ l.label }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
 
       <ion-item class="ion-margin-bottom">
-        <ion-input label="URL de Imagen (Opcional)" labelPlacement="floating" type="text" [(ngModel)]="image"></ion-input>
+        <ion-select label="Posición *" labelPlacement="floating" placeholder="Selecciona posición" [(ngModel)]="position">
+          <ion-select-option value="Goalkeeper">Goalkeeper</ion-select-option>
+          <ion-select-option value="Defender">Defender</ion-select-option>
+          <ion-select-option value="Midfielder">Midfielder</ion-select-option>
+          <ion-select-option value="Attacker">Attacker</ion-select-option>
+        </ion-select>
       </ion-item>
 
-      <div class="ion-text-center ion-margin-vertical">
-        <ion-button color="secondary" (click)="takePicture()">
-          Usar Cámara Dispositivo
+      <h4 class="section-title">Estadísticas del Jugador</h4>
+      <div class="stats-grid">
+        <ion-item>
+          <ion-input label="Partidos" labelPlacement="floating" type="number" [(ngModel)]="matchesPlayed" min="0"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Goles" labelPlacement="floating" type="number" [(ngModel)]="goals" min="0"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Asistencias" labelPlacement="floating" type="number" [(ngModel)]="assists" min="0"></ion-input>
+        </ion-item>
+      </div>
+
+      <ion-item class="ion-margin-top ion-margin-bottom" *ngIf="!image">
+        <ion-input label="O introduce URL de Imagen externa" labelPlacement="floating" type="text" [(ngModel)]="image"></ion-input>
+      </ion-item>
+
+      <div class="ion-text-center ion-margin-vertical" *ngIf="!image">
+        <ion-button color="secondary" (click)="selectImageSource()">
+          <ion-icon name="camera-outline" slot="start"></ion-icon>
+          Seleccionar Foto o Cámara
         </ion-button>
       </div>
 
-      <div *ngIf="image" class="ion-text-center ion-margin-bottom">
-        <img [src]="image" style="max-height: 150px; border-radius: 8px;" />
+      <div *ngIf="image" class="ion-text-center ion-margin-bottom image-preview-container">
+        <img [src]="image" class="preview-img" alt="Previsualización del jugador" />
+        <div class="delete-btn-wrapper">
+          <ion-button color="danger" size="small" fill="outline" (click)="clearImage()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar foto actual
+          </ion-button>
+        </div>
       </div>
 
-      <h4>Ubicación de Alta (Editable haciendo clic)</h4>
-      <div id="mapId" style="width: 100%; height: 250px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc; z-index: 1;"></div>
+      <h4 class="section-title">Ubicación de Alta (Editable moviendo el marcador o pulsando en el mapa)</h4>
       
-      <p style="font-size: 0.85em; color: gray;"> Lat: {{ latitude }} | Lng: {{ longitude }}</p>
+      <div id="mapId" class="map-box"></div>
+      
+      <p class="coordinates-text">Lat: {{ latitude }} | Lng: {{ longitude }}</p>
 
-      <ion-button expand="block" color="success" class="ion-margin-top" (click)="savePlayer()">
+      <ion-button expand="block" color="success" class="ion-margin-top" [disabled]="!name || !team || !league || !position" (click)="savePlayer()">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
         Guardar Jugador
       </ion-button>
     </ion-card-content>

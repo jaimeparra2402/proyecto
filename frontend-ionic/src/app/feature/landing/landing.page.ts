@@ -28,15 +28,15 @@ import {
 export class LandingPage {
   private router = inject(Router);
 
+  ionViewWillEnter() {
+    localStorage.clear();
+  }
+
   goToRegister() {
     this.router.navigate(['/register']);
   }
 
   goToList() {
     this.router.navigate(['/player-list']);
-  }
-
-  goToSearch() {
-    this.router.navigate(['/player-search']);
   }
 }

@@ -65,10 +65,12 @@
   <app-list
     *ngIf="!loading && players.length > 0"
     [items]="players"
-    [type]="'external'"
+    type="external"
+    [isLoggedIn]="hasToken"
+    (onImportPlayer)="savePlayerToLocal($event)"
   >
   </app-list>
-
+  
   <div
     *ngIf="!loading && searched && players.length === 0"
     class="empty-state ion-text-center ion-padding"

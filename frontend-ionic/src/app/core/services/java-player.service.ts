@@ -12,12 +12,7 @@ export class JavaPlayerService implements PlayerStrategy {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
 
-  // URL Base para el backend en Java (Spring Boot)
   private apiUrl = `${environment.apiJava}/players`;
-
-  // =========================================================================
-  // SECCIÓN: JUGADORES (CRUD)
-  // =========================================================================
 
   getPlayers(filters?: any): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl, { params: filters });
@@ -45,11 +40,6 @@ export class JavaPlayerService implements PlayerStrategy {
     );
   }
 
-  // =========================================================================
-  // SECCIÓN: COMENTARIOS Y VALORACIONES
-  // =========================================================================
-
-  // 🆕 AÑADIDO: Obtener comentarios de un jugador
   getComments(playerId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${playerId}/comments`);
   }
@@ -67,11 +57,6 @@ export class JavaPlayerService implements PlayerStrategy {
     );
   }
 
-  // =========================================================================
-  // SECCIÓN: EXTERNA (API-Football) - Adaptado a las rutas de tu API Java
-  // =========================================================================
-
-  // 🆕 AÑADIDO: Buscar jugadores en la API externa desde Java
   searchExternalPlayer(searchParams: {
     search: string;
     league?: string;
@@ -82,7 +67,6 @@ export class JavaPlayerService implements PlayerStrategy {
     });
   }
 
-  // 🆕 AÑADIDO: Importar jugadores seleccionados a la base de datos de Java
   importPlayers(importData: {
     players: any[];
     latitude?: number;
@@ -91,11 +75,6 @@ export class JavaPlayerService implements PlayerStrategy {
     return this.http.post<any>(`${this.apiUrl}/external/import`, importData);
   }
 
-  // =========================================================================
-  // SECCIÓN: IA (Inteligencia Artificial)
-  // =========================================================================
-
-  // 🆕 AÑADIDO: Obtener el equipo ideal generado por la IA en Java
   getEquipoIdeal(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/external/equipo-ideal`);
   }

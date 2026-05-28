@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerFactoryService } from '../../core/services/player-factory.service';
 import { AuthService } from '../../core/services/auth.service';
+import { Geolocation } from '@capacitor/geolocation';
 import {
   IonContent,
   IonHeader,
@@ -69,7 +70,6 @@ export class PlayerDetailPage implements OnInit {
   player: any = null;
   comments: any[] = [];
   
-  // Campos del formulario requeridos
   author: string = '';
   commentText: string = '';
   rating: number = 5;
@@ -94,21 +94,33 @@ export class PlayerDetailPage implements OnInit {
       .getPlayerById(this.playerId)
       .subscribe({
         next: (data: any) => {
-          this.player = data?.data?.player || data; // Maneja la envoltura de respuesta si existe
+          this.player = data?.data?.player || data;
           this.comments = this.player?.comments || [];
         },
         error: (err) => console.error('Error al cargar detalle:', err),
       });
   }
 
-  sendComment() {
-    // Validación de texto vacío y límite de 1000 caracteres exigido
+  async sendComment() {
     if (!this.commentText.trim() || this.commentText.length > 1000) return;
+
+    let latitude = 40.416775;
+    let longitude = -3.703790;
+
+    try {
+      const coordinates = await Geolocation.getCurrentPosition();
+      latitude = coordinates.coords.latitude;
+      longitude = coordinates.coords.longitude;
+    } catch (e) {
+      console.warn('No se pudo capturar la geolocalización para el comentario, usando coordenadas por defecto.');
+    }
 
     const commentData = {
       author: this.author.trim() || 'Anónimo',
       text: this.commentText.trim(),
       rating: Number(this.rating),
+      latitude: latitude,
+      longitude: longitude,
       createdAt: new Date(),
     };
 
@@ -120,7 +132,7 @@ export class PlayerDetailPage implements OnInit {
           this.commentText = '';
           this.author = '';
           this.rating = 5;
-          this.loadPlayerDetails(); // Recarga la ficha y la lista de comentarios
+          this.loadPlayerDetails();
         },
         error: (err) => console.error('Error al añadir comentario:', err),
       });

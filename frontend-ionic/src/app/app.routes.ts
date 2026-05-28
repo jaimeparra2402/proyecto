@@ -38,9 +38,13 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/ideal-team/ideal-team.page').then((m) => m.IdealTeamPage),
   },
   {
+    path: 'edit-player/:id',
+    loadComponent: () => import('./feature/edit-player/edit-player.page').then( m => m.EditPlayerPage)
+  },
+  {
     path: '',
     redirectTo: 'landing',
     pathMatch: 'full',
-  },
+  } 
 
 ];

@@ -13,8 +13,8 @@ const commentSchema = new mongoose.Schema({
     min: 0, 
     max: 5                                        
   },
-  latitude: { type: Number },
-  longitude: { type: Number },
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -23,7 +23,9 @@ const playerSchema = new mongoose.Schema({
   team: { type: String, required: true, trim: true },      
   league: { type: String, trim: true },
   position: { type: String, required: true },
-  imageUrl: { type: String, required: true },             
+  imageUrl: { type: String, required: true },
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },             
   stats: {
     goals: { type: Number, default: 0 },
     assists: { type: Number, default: 0 },

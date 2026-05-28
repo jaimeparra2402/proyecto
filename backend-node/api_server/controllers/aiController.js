@@ -3,7 +3,6 @@ const Player = require('../models/Player');
 
 exports.generateIdealTeam = async (req, res) => {
   try {
-    // 1. Obtener todos los jugadores insertados en nuestra base de datos local
     const localPlayers = await Player.find();
 
     if (localPlayers.length < 11) {
@@ -13,15 +12,12 @@ exports.generateIdealTeam = async (req, res) => {
       });
     }
 
-    // 2. Formatear la lista de jugadores para que la IA la entienda a la perfección
     const playersListForAI = localPlayers.map(p => (
       `- Nombre: ${p.name}, Equipo: ${p.team}, Posición: ${p.position}, Goles: ${p.stats.goals}, Asistencias: ${p.stats.assists}, Partidos: ${p.stats.matchesPlayed}`
     )).join('\n');
 
-    // 3. Inicializar el cliente de Google AI Studio con tu API Key
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    // 4. Diseñar las instrucciones exactas para el LLM
     const prompt = `
       Eres un director técnico de fútbol profesional de élite mundial. 
       A continuación te proporciono la lista de jugadores disponibles en mi base de datos local con sus respectivas estadísticas:

@@ -7,7 +7,57 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding grey-background">
+  
+  <div class="search-container ion-margin-bottom">
+    <h2 class="search-title">Filtros de Búsqueda</h2>
+    
+    <div class="filter-box">
+      <div class="input-wrapper">
+        <ion-icon name="person-outline" class="input-icon"></ion-icon>
+        <ion-input 
+          label="Nombre del jugador" 
+          labelPlacement="floating" 
+          type="text" 
+          [(ngModel)]="searchName" 
+          placeholder="Ej: Sergio Ramos">
+        </ion-input>
+      </div>
+
+      <div class="input-wrapper">
+        <ion-icon name="shield-outline" class="input-icon"></ion-icon>
+        <ion-input 
+          label="Equipo o Liga" 
+          labelPlacement="floating" 
+          type="text" 
+          [(ngModel)]="searchTeam" 
+          placeholder="Ej: Real Madrid o LaLiga">
+        </ion-input>
+      </div>
+
+      <div class="input-wrapper">
+        <ion-icon name="calendar-clear-outline" class="input-icon"></ion-icon>
+        <ion-input 
+          label="Dado de alta desde" 
+          labelPlacement="floating" 
+          type="date" 
+          [(ngModel)]="searchDate">
+        </ion-input>
+      </div>
+    </div>
+
+    <div class="action-buttons-group">
+      <ion-button class="btn-clear" fill="clear" color="medium" (click)="clearFilters()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Limpiar
+      </ion-button>
+      <ion-button class="btn-search" color="primary" (click)="applyFilters()">
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        Buscar Jugador
+      </ion-button>
+    </div>
+  </div>
+
   <app-list
     [items]="players"
     type="players"
@@ -17,4 +67,9 @@
     (delete)="onDeletePlayer($event)"
   >
   </app-list>
+
+  <div *ngIf="players.length === 0" class="ion-text-center ion-padding no-results-box">
+    <ion-icon name="alert-circle-outline" class="no-results-icon"></ion-icon>
+    <p>No se encontraron resultados para los filtros aplicados.</p>
+  </div>
 </ion-content>

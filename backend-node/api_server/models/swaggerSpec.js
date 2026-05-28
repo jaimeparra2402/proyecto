@@ -55,13 +55,15 @@ const swaggerSpec = {
             'application/json': {
               schema: {
                 type: 'object',
-                required: ['name', 'team', 'position', 'imageUrl'],
+                required: ['name', 'team', 'position', 'imageUrl', 'latitude', 'longitude'],
                 properties: {
                   name: { type: 'string' },
                   team: { type: 'string' },
                   league: { type: 'string' },
                   position: { type: 'string' },
                   imageUrl: { type: 'string' },
+                  latitude: { type: 'number', description: 'Latitud de la ubicación de alta del jugador' },
+                  longitude: { type: 'number', description: 'Longitud de la ubicación de alta del jugador' },
                   stats: {
                     type: 'object',
                     properties: {
@@ -105,7 +107,9 @@ const swaggerSpec = {
                   name: { type: 'string' },
                   team: { type: 'string' },
                   position: { type: 'string' },
-                  imageUrl: { type: 'string' }
+                  imageUrl: { type: 'string' },
+                  latitude: { type: 'number' },
+                  longitude: { type: 'number' }
                 }
               }
             }
@@ -163,6 +167,8 @@ const swaggerSpec = {
                           username: { type: 'string', example: 'usuario@correo.com' },
                           text: { type: 'string', example: '¡Qué buen rendimiento tiene este jugador!' },
                           rating: { type: 'number', example: 5 },
+                          latitude: { type: 'number', example: 40.416775 },
+                          longitude: { type: 'number', example: -3.703790 },
                           createdAt: { type: 'string', example: '2026-05-25T20:15:00.000Z' }
                         }
                       }
@@ -187,10 +193,13 @@ const swaggerSpec = {
             'application/json': {
               schema: {
                 type: 'object',
-                required: ['text', 'rating'],
+                required: ['text', 'rating', 'latitude', 'longitude'],
                 properties: {
+                  author: { type: 'string', default: 'Anónimo' },
                   text: { type: 'string', maxLength: 1000 },
-                  rating: { type: 'number', minimum: 0, maximum: 5 }
+                  rating: { type: 'number', minimum: 0, maximum: 5 },
+                  latitude: { type: 'number', description: 'Latitud capturada automáticamente del cliente' },
+                  longitude: { type: 'number', description: 'Longitud capturada automáticamente del cliente' }
                 }
               }
             }

@@ -17,8 +17,14 @@ import {
   IonButtons, 
   IonBackButton, 
   IonCard, 
-  IonCardContent 
+  IonCardContent,
+  IonIcon,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { cameraOutline, trashOutline, saveOutline } from 'ionicons/icons';
+import { LEAGUES } from '../../core/constants/leagues.constants';
 
 @Component({
   selector: 'app-add-player',
@@ -38,7 +44,10 @@ import {
     IonButtons, 
     IonBackButton, 
     IonCard, 
-    IonCardContent
+    IonCardContent,
+    IonIcon,
+    IonSelect,
+    IonSelectOption
   ]
 })
 export class AddPlayerPage implements OnInit {
@@ -48,13 +57,27 @@ export class AddPlayerPage implements OnInit {
   name = '';
   team = '';
   league = '';
+  position = '';
   image = '';
+  
+  goals = 0;
+  assists = 0;
+  matchesPlayed = 0;
   
   latitude = 40.416775;
   longitude = -3.703790;
   
+  leagues = LEAGUES;
   private map!: L.Map;
   private marker!: L.Marker;
+
+  constructor() {
+    addIcons({
+      'camera-outline': cameraOutline,
+      'trash-outline': trashOutline,
+      'save-outline': saveOutline
+    });
+  }
 
   ngOnInit() {
     this.initGeoAndMap();
@@ -66,7 +89,7 @@ export class AddPlayerPage implements OnInit {
       this.latitude = coordinates.coords.latitude;
       this.longitude = coordinates.coords.longitude;
     } catch (e) {
-      console.warn('No se pudo obtener la ubicación actual, usando coordenadas por defecto.');
+      console.warn('No se pudo obtener la ubicación actual de forma automática, usando coordenadas por defecto.');
     }
     this.loadMap();
   }
@@ -93,7 +116,7 @@ export class AddPlayerPage implements OnInit {
     });
   }
 
-  async takePicture() {
+  async selectImageSource() {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
@@ -103,12 +126,16 @@ export class AddPlayerPage implements OnInit {
       });
       this.image = image.webPath || '';
     } catch (error) {
-      console.error('Cámara cerrada o error al capturar imagen', error);
+      console.error('Flujo de captura de imagen cancelado:', error);
     }
   }
 
+  clearImage() {
+    this.image = '';
+  }
+
   savePlayer() {
-    if (!this.name || !this.team || !this.league) {
+    if (!this.name || !this.team || !this.league || !this.position) {
       alert('Por favor, rellena los campos obligatorios.');
       return;
     }
@@ -117,14 +144,20 @@ export class AddPlayerPage implements OnInit {
       name: this.name,
       team: this.team,
       league: this.league,
-      image: this.image,
+      position: this.position,
+      imageUrl: this.image,
       latitude: this.latitude,
-      longitude: this.longitude
+      longitude: this.longitude,
+      stats: {
+        goals: Number(this.goals) || 0,
+        assists: Number(this.assists) || 0,
+        matchesPlayed: Number(this.matchesPlayed) || 0
+      }
     };
 
     this.playerFactory.getService().createPlayer(newPlayer).subscribe({
       next: () => {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/player-list']);
       },
       error: (err: any) => console.error('Error al guardar el jugador:', err)
     });

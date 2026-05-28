@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NodePlayerService } from '../../core/services/node-player.service';
+import { Geolocation } from '@capacitor/geolocation';
 import {
   IonContent,
   IonHeader,
@@ -69,11 +69,42 @@ export class PlayerSearchPage {
     );
   }
 
-  goToDetail(player: any) {
-    const playerId = player._id || player.id; // Controla ambos formatos de ID
-    if (playerId) {
-      this.router.navigate(['/player-detail', playerId]);
+  async savePlayerToLocal(player: any) {
+    let latitude = 40.416775;
+    let longitude = -3.703790;
+
+    try {
+      const coordinates = await Geolocation.getCurrentPosition();
+      latitude = coordinates.coords.latitude;
+      longitude = coordinates.coords.longitude;
+    } catch (e) {
+      console.warn('No se pudo obtener la ubicación para la importación, usando coordenadas por defecto.');
     }
+
+    const playerData = {
+      name: player.name,
+      team: player.team,
+      league: player.league,
+      position: player.position,
+      imageUrl: player.imageUrl || player.image,
+      latitude: latitude,
+      longitude: longitude,
+      stats: {
+        goals: player.stats?.goals || 0,
+        assists: player.stats?.assists || 0,
+        matchesPlayed: player.stats?.matchesPlayed || 0
+      }
+    };
+
+    this.playerService.createPlayer(playerData).subscribe({
+      next: (response) => {
+        console.log('Jugador guardado localmente con éxito', response);
+        this.router.navigate(['/player-list']);
+      },
+      error: (error) => {
+        console.error('Error al guardar el jugador en la base de datos', error);
+      }
+    });
   }
 
   search() {
@@ -98,5 +129,9 @@ export class PlayerSearchPage {
           this.loading = false;
         },
       });
+  }
+
+  get hasToken(): boolean {
+    return !!localStorage.getItem('token') || !!sessionStorage.getItem('token');
   }
 }
