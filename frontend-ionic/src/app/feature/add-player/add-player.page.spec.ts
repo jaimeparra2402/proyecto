@@ -15,6 +15,12 @@ describe('AddPlayerPage (Pruebas Unitarias)', () => {
   let mockPlayerFactory: any;
   let mockRouter: any;
 
+  // Creamos un mock limpio y tipado para simular el encadenamiento de métodos en Leaflet
+  const mockLeafletChain: any = {
+    setView: () => mockLeafletChain,
+    addTo: () => mockLeafletChain
+  };
+
   beforeEach(async () => {
     mockPlayerService = {
       createPlayer: jasmine.createSpy('createPlayer').and.returnValue(of({ id: '123' }))
@@ -42,22 +48,14 @@ describe('AddPlayerPage (Pruebas Unitarias)', () => {
       } as any)
     );
 
-    // Evitamos problemas de renderizado de mapas manipulando Leaflet en la prueba
-    spyOn(L, 'map').and.returnValue({
-      setView: jasmine.createSpy('setView').and.newValue = function() { return this; }, 
-      setView: jasmine.createSpy('setView').and.callFake(function() { return this; }),
-      addTo: jasmine.createSpy('addTo').and.callFake(function() { return this; }),
-    } as any);
+    // Evitamos problemas de renderizado de mapas manipulando Leaflet de forma segura
+    spyOn(L, 'map').and.returnValue(mockLeafletChain);
 
     spyOn(L, 'tileLayer').and.returnValue({
-      addTo: jasmine.createSpy('addTo')
+      addTo: jasmine.createSpy('addTo').and.returnValue(mockLeafletChain)
     } as any);
 
-    spyOn(L, 'marker').and.returnValue({
-      setView: jasmine.createSpy('setView').and.newValue = function() { return this; },
-      setView: jasmine.createSpy('setView').and.callFake(function() { return this; }),
-      addTo: jasmine.createSpy('addTo').and.callFake(function() { return this; }),
-    } as any);
+    spyOn(L, 'marker').and.returnValue(mockLeafletChain);
 
     await TestBed.configureTestingModule({
       imports: [AddPlayerPage],
