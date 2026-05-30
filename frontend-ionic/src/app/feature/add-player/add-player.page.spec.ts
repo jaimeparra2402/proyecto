@@ -44,8 +44,9 @@ describe('AddPlayerPage (Pruebas Unitarias)', () => {
 
     // Evitamos problemas de renderizado de mapas manipulando Leaflet en la prueba
     spyOn(L, 'map').and.returnValue({
-      setView: jasmine.createSpy('setView').and.returnThis(),
-      on: jasmine.createSpy('on')
+      setView: jasmine.createSpy('setView').and.newValue = function() { return this; }, 
+      setView: jasmine.createSpy('setView').and.callFake(function() { return this; }),
+      addTo: jasmine.createSpy('addTo').and.callFake(function() { return this; }),
     } as any);
 
     spyOn(L, 'tileLayer').and.returnValue({
@@ -53,8 +54,9 @@ describe('AddPlayerPage (Pruebas Unitarias)', () => {
     } as any);
 
     spyOn(L, 'marker').and.returnValue({
-      addTo: jasmine.createSpy('addTo').and.returnThis(),
-      on: jasmine.createSpy('on')
+      setView: jasmine.createSpy('setView').and.newValue = function() { return this; },
+      setView: jasmine.createSpy('setView').and.callFake(function() { return this; }),
+      addTo: jasmine.createSpy('addTo').and.callFake(function() { return this; }),
     } as any);
 
     await TestBed.configureTestingModule({

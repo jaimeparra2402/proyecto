@@ -1,7 +1,6 @@
 import { Observable, of } from 'rxjs';
-import { PlayerStrategy } from './player-strategy.interface';
+import { PlayerStrategy } from './player.strategy';
 
-// 1. Creamos una clase concreta Dummy que implemente obligatoriamente la interfaz
 class MockPlayerService implements PlayerStrategy {
   getPlayers(filters?: any): Observable<any[]> {
     return of([{ id: '1', name: 'Test Player' }]);
@@ -39,7 +38,6 @@ describe('PlayerStrategy Interface (Pruebas Estructurales)', () => {
   let strategyImplementation: PlayerStrategy;
 
   beforeEach(() => {
-    // Instanciamos la clase que simula la estrategia
     strategyImplementation = new MockPlayerService();
   });
 

@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 
+
 export interface PlayerStrategy {
 
   getPlayers(filters?: any): Observable<any[]>;

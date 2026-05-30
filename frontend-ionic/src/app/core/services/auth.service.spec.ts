@@ -4,17 +4,16 @@ import { AuthService } from './auth.service';
 import { Auth } from '@angular/fire/auth';
 import { environment } from '../../../environments/environment';
 import * as fireAuth from '@angular/fire/auth';
+import { of } from 'rxjs'; 
 
 describe('AuthService (Pruebas Unitarias)', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
 
-  // Mocks de Firebase
   let mockAuth: any;
   let mockUserInstance: any;
 
   beforeEach(() => {
-    // Inicializamos la estructura simulada del usuario de Firebase
     mockUserInstance = {
       uid: 'firebase_uid_123',
       email: 'test@gmail.com',
@@ -25,8 +24,7 @@ describe('AuthService (Pruebas Unitarias)', () => {
       currentUser: mockUserInstance
     };
 
-    // Espiamos los métodos exportados de @angular/fire/auth para evitar conexiones reales
-    spyOn(fireAuth, 'user').and.returnValue(fireAuth.of(mockUserInstance) as any);
+    spyOn(fireAuth, 'user').and.returnValue(of(mockUserInstance) as any);
     spyOn(fireAuth, 'signInWithEmailAndPassword').and.returnValue(
       Promise.resolve({ user: mockUserInstance } as any)
     );
