@@ -7,32 +7,20 @@
     (click)="selectItem(item)"
   >
     <ng-container *ngIf="type === 'players' || type === 'external'">
-      <div slot="start" class="avatar">
-        <img
-          *ngIf="item.imageUrl || item.photo; else initials"
-          [src]="item.imageUrl || item.photo"
-          [alt]="item.name"
-        />
-        <ng-template #initials>{{ getInitials(item.name) }}</ng-template>
-      </div>
-
-      <ion-label class="player-info">
-        <h2>{{ item.name }}</h2>
-        <p>
-          {{ item.team }}
-          <span class="dot" aria-hidden="true"></span>
-          {{ item.league }}
-        </p>
-      </ion-label>
-
-      <span
-        *ngIf="item.position"
-        slot="end"
-        class="badge"
-        [ngClass]="item.position | lowercase"
-      >
-        {{ item.position }}
-      </span>
+      <player-row-item
+        [name]="item.name"
+        [team]="item.team"
+        [league]="item.league"
+        [position]="item.position"
+        [imageUrl]="item.imageUrl || item.photo"
+        [type]="type"
+        [isAdmin]="isAdmin"
+        [isLoggedIn]="isLoggedIn"
+        (editClick)="editItem(item)"
+        (deleteClick)="deleteItem(item)"
+        (importClick)="importSinglePlayer(item)"
+        style="width: 100%;"
+      ></player-row-item>
     </ng-container>
 
     <ng-container *ngIf="type === 'comments'">
@@ -49,26 +37,6 @@
         </div>
       </ion-label>
     </ng-container>
-
-    <div slot="end" *ngIf="isAdmin" style="display: flex; gap: 5px;">
-      <ion-button fill="clear" color="primary" (click)="$event.stopPropagation(); edit.emit(item)">
-        <ion-icon name="create-outline"></ion-icon>
-      </ion-button>
-
-      <ion-button fill="clear" color="danger" (click)="$event.stopPropagation(); delete.emit(item)">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
-    </div>
-
-    <ion-button 
-      *ngIf="(type === 'external' || type.includes('external')) && isLoggedIn" 
-      slot="end" 
-      fill="clear" 
-      color="success"
-      (click)="$event.stopPropagation(); importSinglePlayer(item)"
-    >
-      <ion-icon name="cloud-download-outline" slot="icon-only"></ion-icon>
-    </ion-button>
   </ion-item>
 </div>
 

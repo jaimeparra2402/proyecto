@@ -1,18 +1,29 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Portal de Jugadores</ion-title>
-  </ion-toolbar>
-  <app-api-toggle></app-api-toggle>
-</ion-header>
+<app-header
+  title="Bienvenidos"
+  [showBackButton]="false"
+  [forceLoggedOut]="true"> 
+</app-header>
 
-<ion-content class="ion-padding">
-  <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 40px auto 0 auto;">
-    <ion-button color="success" (click)="goToRegister()">
-      Registrarse
-    </ion-button>
-    
-    <ion-button color="primary" (click)="goToList()">
-      Listado de Jugadores
-    </ion-button>
+<ion-content>
+  <div class="landing-container">
+
+    <div class="hero-section">
+      <h1 class="hero-title">Football<span class="hero-accent">Manager</span></h1>
+      <p class="hero-subtitle">Gestiona y descubre jugadores de todo el mundo</p>
+    </div>
+
+    <div class="toggle-section">
+      <p class="toggle-label">Backend activo</p>
+      <app-api-toggle></app-api-toggle>
+    </div>
+
+    <button class="main-btn" (click)="goToList()">
+      <span class="btn-text">
+        <strong>Ver jugadores</strong>
+        <small>Accede al listado completo</small>
+      </span>
+      <span class="btn-arrow">→</span>
+    </button>
+
   </div>
 </ion-content>

@@ -25,6 +25,7 @@ import {
 import { addIcons } from 'ionicons';
 import { cameraOutline, trashOutline, saveOutline } from 'ionicons/icons';
 import { LEAGUES } from '../../core/constants/leagues.constants';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-add-player',
@@ -32,23 +33,24 @@ import { LEAGUES } from '../../core/constants/leagues.constants';
   styleUrls: ['./add-player.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    IonContent, 
-    IonHeader, 
-    IonTitle, 
-    IonToolbar, 
-    IonItem, 
-    IonInput, 
-    IonButton, 
-    IonButtons, 
-    IonBackButton, 
-    IonCard, 
+    CommonModule,
+    FormsModule,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonItem,
+    IonInput,
+    IonButton,
+    IonButtons,
+    IonBackButton,
+    IonCard,
     IonCardContent,
     IonIcon,
     IonSelect,
-    IonSelectOption
-  ]
+    IonSelectOption,
+    HeaderComponent
+]
 })
 export class AddPlayerPage implements OnInit {
   private playerFactory = inject(PlayerFactoryService);

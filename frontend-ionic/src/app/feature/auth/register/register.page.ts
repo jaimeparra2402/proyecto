@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personAddOutline, alertCircleOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-register',
@@ -18,8 +19,9 @@ import { personAddOutline, alertCircleOutline, eyeOutline, eyeOffOutline } from 
   imports: [
     CommonModule, FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonInput,
-    IonButton, IonButtons, IonBackButton, IonIcon, IonSpinner, IonCard, IonCardContent
-  ]
+    IonButton, IonButtons, IonBackButton, IonIcon, IonSpinner, IonCard, IonCardContent,
+    HeaderComponent
+]
 })
 export class RegisterPage {
   private authService = inject(AuthService);
@@ -37,7 +39,6 @@ export class RegisterPage {
     addIcons({ personAddOutline, alertCircleOutline, eyeOutline, eyeOffOutline });
   }
 
-  // Ahora el formulario es válido si hay correo y la contraseña tiene un largo de 6+
   get formValid(): boolean {
     return !!this.email && this.password.length >= 6;
   }
@@ -51,7 +52,6 @@ export class RegisterPage {
 
     this.loading = true;
     try {
-      // Modificado para pasar únicamente email y password
       await this.authService.registerInFirebaseAndBackend(this.email, this.password);
       this.router.navigate(['/home']);
     } catch (error: any) {

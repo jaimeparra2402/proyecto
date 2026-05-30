@@ -1,99 +1,243 @@
-// Tarjeta de detalles del jugador
+ion-content {
+  --background: linear-gradient(180deg, #0f3460 0%, #1a1a2e 100%);
+}
+
 .player-detail-card {
-  margin: 0 0 16px 0;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  --background: rgba(255, 255, 255, 0.05);
 
-  // 🌟 NUEVO CONTENEDOR DE LA IMAGEN CONTROLADO
-  .avatar-banner {
-    width: 100%;
-    height: 200px; // Altura fija ideal para móviles y tablets
-    background-color: #f4f5f8; // Fondo neutro por si la imagen es pequeña o PNG transparente
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--ion-color-step-100, #e6e6e6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: none;
+  margin-bottom: 1rem;
+}
 
-    img {
-      max-width: 150px; // Evita que el rostro o cuerpo del jugador ocupe toda la pantalla
-      height: 100%;
-      object-fit: contain; // Mantiene las proporciones originales sin estirar ni pixelar
-      filter: drop-shadow(
-        0px 4px 6px rgba(0, 0, 0, 0.15)
-      ); // Le da profundidad a la silueta
-    }
-  }
+.avatar-banner {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1rem 1rem;
 
-  // Resto de estilos internos de la tarjeta
-  .player-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--ion-color-dark);
-  }
+  img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
 
-  .player-team {
-    font-size: 0.95rem;
-    letter-spacing: 0.3px;
-  }
+    border-radius: 20px;
 
-  .player-info {
-    font-size: 1rem;
-    margin-bottom: 6px;
-    color: var(--ion-color-step-700, #333);
-  }
+    border: 3px solid rgba(255, 255, 255, 0.08);
 
-  // REJILLA DE ESTADÍSTICAS
-  .stats-section {
-    margin-top: 18px;
-    padding-top: 15px;
-    border-top: 1px solid var(--ion-color-step-150, #eee);
-
-    .stats-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--ion-color-step-550, #666);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .stats-grid {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .stat-box {
-      flex: 1;
-      background: var(--ion-color-step-50, #f9f9f9);
-      padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-
-      .stat-value {
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: var(--ion-color-dark);
-
-        &.goals {
-          color: var(--ion-color-success, #2dd36f);
-        }
-        &.assists {
-          color: var(--ion-color-tertiary, #5260ff);
-        }
-      }
-
-      .stat-label {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: var(--ion-color-medium, #777);
-        margin-top: 2px;
-      }
-    }
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   }
 }
 
-// (Conserva los demás estilos inferiores que ya tenías para .admin-actions-container, .comments-list, etc.)
+.player-name {
+  color: white;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.player-team {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.player-info {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+
+  strong {
+    color: white;
+  }
+}
+
+.stats-section {
+  margin-top: 1.5rem;
+}
+
+.stats-title {
+  color: white;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 16px;
+
+  padding: 1rem 0.75rem;
+
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.stat-value.goals {
+  color: #2ed573;
+}
+
+.stat-value.assists {
+  color: #4da3ff;
+}
+
+.stat-label {
+  margin-top: 4px;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 0.75rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.admin-actions-container {
+  margin-bottom: 1.5rem;
+}
+
+.action-btn {
+  margin-bottom: 10px;
+}
+
+ion-button[color="warning"] {
+  --border-radius: 14px;
+}
+
+ion-button[color="danger"] {
+  --border-radius: 14px;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  color: rgba(255, 255, 255, 0.35);
+
+  margin: 1.5rem 0 0.75rem 4px;
+}
+
+
+.comments-list {
+  background: transparent;
+}
+
+.comment-item {
+  --background: rgba(255, 255, 255, 0.05);
+  --border-color: transparent;
+
+  border-radius: 14px;
+
+  margin-bottom: 10px;
+}
+
+.comment-author {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.comment-stars {
+  color: #ffd32a;
+  margin-left: 6px;
+}
+
+.comment-text {
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.no-comments-msg {
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  margin-top: 1rem;
+}
+
+.add-comment-card {
+  --background: rgba(255, 255, 255, 0.05);
+
+  border-radius: 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  margin-top: 1rem;
+}
+
+.form-title {
+  color: white;
+  font-size: 1rem;
+}
+
+.form-item {
+  --background: rgba(255, 255, 255, 0.06);
+
+  --border-color: transparent;
+
+  --border-radius: 12px;
+
+  --color: white;
+
+  margin-bottom: 12px;
+
+  border-radius: 12px;
+}
+
+.form-item ion-input,
+.form-item ion-textarea,
+.form-item ion-select {
+  --color: white;
+  --placeholder-color: rgba(255, 255, 255, 0.35);
+}
+
+.add-comment-card ion-button {
+  --background: linear-gradient(135deg, #2ed573, #1e9e52);
+
+  --border-radius: 14px;
+
+  --box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3);
+
+  font-weight: 700;
+}
+
+
+.player-detail-card,
+.add-comment-card,
+.comment-item {
+  animation: fadeUp 0.25s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

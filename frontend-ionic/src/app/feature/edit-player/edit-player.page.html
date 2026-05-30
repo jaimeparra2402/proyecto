@@ -1,11 +1,5 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="'/player-detail/' + playerId"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Editar Jugador</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Editar Jugador" [defaultHref]="'/player-detail/' + playerId">
+</app-header>
 
 <ion-content class="ion-padding grey-background">
   <div class="form-container" *ngIf="player">
@@ -14,45 +8,49 @@
     <div class="form-box">
       <div class="input-wrapper">
         <ion-icon name="person-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="Nombre Completo" 
-          labelPlacement="floating" 
-          type="text" 
-          [(ngModel)]="player.name" 
-          placeholder="Ej: Sergio Ramos">
+        <ion-input
+          label="Nombre Completo"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="player.name"
+          placeholder="Ej: Sergio Ramos"
+        >
         </ion-input>
       </div>
 
       <div class="input-wrapper">
         <ion-icon name="shield-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="Equipo" 
-          labelPlacement="floating" 
-          type="text" 
-          [(ngModel)]="player.team" 
-          placeholder="Ej: Real Madrid">
+        <ion-input
+          label="Equipo"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="player.team"
+          placeholder="Ej: Real Madrid"
+        >
         </ion-input>
       </div>
 
       <div class="input-wrapper">
         <ion-icon name="trophy-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="Liga" 
-          labelPlacement="floating" 
-          type="text" 
-          [(ngModel)]="player.league" 
-          placeholder="Ej: LaLiga">
+        <ion-input
+          label="Liga"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="player.league"
+          placeholder="Ej: LaLiga"
+        >
         </ion-input>
       </div>
 
       <div class="input-wrapper select-wrapper">
         <ion-icon name="options-outline" class="input-icon"></ion-icon>
-        <ion-select 
-          label="Posición" 
-          labelPlacement="floating" 
+        <ion-select
+          label="Posición"
+          labelPlacement="floating"
           [(ngModel)]="player.position"
-          okText="Seleccionar" 
-          cancelText="Cancelar">
+          okText="Seleccionar"
+          cancelText="Cancelar"
+        >
           <ion-select-option value="GK">Portero (GK)</ion-select-option>
           <ion-select-option value="DF">Defensa (DF)</ion-select-option>
           <ion-select-option value="MF">Centrocampista (MF)</ion-select-option>
@@ -62,56 +60,64 @@
 
       <div class="input-wrapper">
         <ion-icon name="image-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="URL de la Foto" 
-          labelPlacement="floating" 
-          type="text" 
-          [(ngModel)]="player.imageUrl" 
-          placeholder="https://...">
+        <ion-input
+          label="URL de la Foto"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="player.imageUrl"
+          placeholder="https://..."
+        >
         </ion-input>
       </div>
 
       <h3 class="section-subtitle ion-margin-top">Estadísticas de Temporada</h3>
-      
+
       <div class="stats-grid">
         <div class="input-wrapper">
           <ion-icon name="football-outline" class="input-icon"></ion-icon>
-          <ion-input 
-            label="Goles" 
-            labelPlacement="floating" 
-            type="number" 
-            [(ngModel)]="player.stats.goals" 
-            placeholder="0">
+          <ion-input
+            label="Goles"
+            labelPlacement="floating"
+            type="number"
+            [(ngModel)]="player.stats.goals"
+            placeholder="0"
+          >
           </ion-input>
         </div>
 
         <div class="input-wrapper">
           <ion-icon name="star-outline" class="input-icon"></ion-icon>
-          <ion-input 
-            label="Asistencias" 
-            labelPlacement="floating" 
-            type="number" 
-            [(ngModel)]="player.stats.assists" 
-            placeholder="0">
+          <ion-input
+            label="Asistencias"
+            labelPlacement="floating"
+            type="number"
+            [(ngModel)]="player.stats.assists"
+            placeholder="0"
+          >
           </ion-input>
         </div>
 
         <div class="input-wrapper">
           <ion-icon name="checkmark-done-outline" class="input-icon"></ion-icon>
-          <ion-input 
-            label="Partidos" 
-            labelPlacement="floating" 
-            type="number" 
-            [(ngModel)]="player.stats.matchesPlayed" 
-            placeholder="0">
+          <ion-input
+            label="Partidos"
+            labelPlacement="floating"
+            type="number"
+            [(ngModel)]="player.stats.matchesPlayed"
+            placeholder="0"
+          >
           </ion-input>
         </div>
       </div>
-
     </div>
 
     <div class="action-buttons-group">
-      <ion-button class="btn-search" color="primary" expand="block" (click)="submitUpdate()">
+      <ion-button
+        class="btn-search"
+        color="primary"
+        expand="block"
+        (click)="submitUpdate()"
+      >
         <ion-icon name="save-outline" slot="start"></ion-icon>
         Guardar Cambios
       </ion-button>

@@ -29,6 +29,7 @@ import {
   calendarClearOutline,
   alertCircleOutline
 } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-player-list',
@@ -47,8 +48,9 @@ import {
     IonBackButton,
     IonInput,
     IonButton,
-    IonIcon
-  ],
+    IonIcon,
+    HeaderComponent
+],
 })
 export class PlayerListPage implements OnInit {
   private playerFactory = inject(PlayerFactoryService);

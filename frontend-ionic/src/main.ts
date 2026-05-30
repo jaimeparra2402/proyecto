@@ -8,10 +8,12 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment'; 
-import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { defineCustomElements as definePwaElements } from '@ionic/pwa-elements/loader';
 
-defineCustomElements(window);
+import { defineCustomElements as defineStencilElements } from 'list/loader'; 
 
+definePwaElements(window);
+defineStencilElements(window);
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

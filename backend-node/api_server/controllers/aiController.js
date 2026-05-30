@@ -38,17 +38,14 @@ exports.generateIdealTeam = async (req, res) => {
       }
     `;
 
-    // 5. Llamar al modelo Gemini para generar el contenido
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // El modelo ultra-rápido e ideal para respuestas JSON estructuradas
+      model: 'gemini-2.5-flash', 
       contents: prompt,
-      // Le forzamos a que la salida obligatoriamente sea un JSON válido
       config: {
         responseMimeType: "application/json"
       }
     });
 
-    // Parseamos la respuesta de la IA antes de enviársela al usuario
     const idealTeamResult = JSON.parse(response.text);
 
     res.status(200).json({

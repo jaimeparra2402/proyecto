@@ -9,7 +9,7 @@ import {
   IonToolbar,
   IonButton,
 } from '@ionic/angular/standalone';
-
+import { HeaderComponent } from "src/app/shared/header/header.component";
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.page.html',
@@ -23,12 +23,17 @@ import {
     IonTitle,
     IonToolbar,
     IonButton,
-  ],
+    HeaderComponent
+],
 })
 export class LandingPage {
   private router = inject(Router);
 
   ionViewWillEnter() {
+    localStorage.clear();
+  }
+
+  ngOnInit() {
     localStorage.clear();
   }
 

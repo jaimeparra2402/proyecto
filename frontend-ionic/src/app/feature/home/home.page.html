@@ -1,49 +1,72 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Panel de Gestión - Fútbol</ion-title>
-  </ion-toolbar>
-  <app-api-toggle></app-api-toggle>
-</ion-header>
+<app-header
+  title="Panel de Gestión"
+  [showBackButton]="false">
+</app-header>
 
-<ion-content class="ion-padding">
-  <div class="user-greeting">
-    <h2>¡Hola, {{ getUsername() }}!</h2>
-    <p>Conectado como: {{ authService.currentUser()?.email }}</p>
-  </div>
+<ion-content>
+  <div class="home-container">
 
-  <div class="ion-margin-bottom">
-    <h3 class="section-title">Funciones de Usuario</h3>
-    <div class="button-grid">
+    <div class="menu-list">
 
-      <ion-button color="success" (click)="goToAddPlayerForm()">
-        Añadir por Formulario
-      </ion-button>
+      <button class="menu-item" (click)="goToPlayerList()">
+        <div class="menu-left">
+          <div class="menu-icon teal">▤</div>
+          <div class="menu-text">
+            <span class="menu-title">Ver jugadores</span>
+            <span class="menu-desc">Listado completo con filtros</span>
+          </div>
+        </div>
+        <span class="menu-arrow">›</span>
+      </button>
 
-      <ion-button color="tertiary" (click)="goToIdealTeam()">
-        Equipo Ideal IA
-      </ion-button>
+      <button class="menu-item" (click)="goToAddPlayerForm()">
+        <div class="menu-left">
+          <div class="menu-icon blue">+</div>
+          <div class="menu-text">
+            <span class="menu-title">Añadir jugador</span>
+            <span class="menu-desc">Crear desde formulario</span>
+          </div>
+        </div>
+        <span class="menu-arrow">›</span>
+      </button>
 
-      <div *ngIf="authService.isSystemAdmin()">
-          <ion-button color="danger" (click)="goToViewNews()">
-            Publicar Noticia CORBA
-          </ion-button>
-      </div>
+      <button class="menu-item" (click)="goToSearchPlayers()">
+        <div class="menu-left">
+          <div class="menu-icon orange">⤓</div>
+          <div class="menu-text">
+            <span class="menu-title">Importar desde API</span>
+            <span class="menu-desc">Buscar en API Football</span>
+          </div>
+        </div>
+        <span class="menu-arrow">›</span>
+      </button>
 
-      <ion-button color="secondary" (click)="goToPlayerList()">
-        Ver Todos los Jugadores
-      </ion-button>
+      <button class="menu-item highlight" (click)="goToIdealTeam()">
+        <div class="menu-left">
+          <div class="menu-icon purple">✦</div>
+          <div class="menu-text">
+            <span class="menu-title">Equipo ideal IA</span>
+            <span class="menu-desc">Generado con Gemini</span>
+          </div>
+        </div>
+        <span class="menu-badge">IA</span>
+      </button>
 
-      <ion-button color="warning" (click)="goToSearchPlayers()">
-       Importar desde la API
-      </ion-button>
     </div>
-  </div>
 
-  <hr class="section-divider" />
+    <div class="admin-section" *ngIf="authService.isSystemAdmin()">
+      <p class="section-label">Administración</p>
+      <button class="menu-item danger" (click)="goToViewNews()">
+        <div class="menu-left">
+          <div class="menu-icon red">📡</div>
+          <div class="menu-text">
+            <span class="menu-title">Publicar Noticia CORBA</span>
+            <span class="menu-desc">Solo administradores</span>
+          </div>
+        </div>
+        <span class="menu-arrow">›</span>
+      </button>
+    </div>
 
-  <div class="logout-container">
-    <ion-button color="dark" fill="outline" (click)="logout()">
-      Cerrar Sesión
-    </ion-button>
   </div>
 </ion-content>

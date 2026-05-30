@@ -11,6 +11,7 @@ import {
   IonToolbar,
   IonButton,
 } from '@ionic/angular/standalone';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-home',
@@ -26,22 +27,20 @@ import {
     IonTitle,
     IonToolbar,
     IonButton,
-  ],
+    HeaderComponent
+],
 })
 export class HomePage {
   public authService = inject(AuthService);
   private router = inject(Router);
 
-  // Extrae el nombre de usuario basándose en el email actual de Firebase
   getUsername(): string {
     const email = this.authService.currentUser()?.email;
     if (!email) return 'Usuario';
     const namePart = email.split('@')[0];
-    // Formatear la primera letra en mayúscula para que quede más estético
     return namePart.charAt(0).toUpperCase() + namePart.slice(1);
   }
 
-  // NAVEGACIÓN PÚBLICA DE USUARIOS
   goToImportApi() {
     this.router.navigate(['/import-api']);
   }

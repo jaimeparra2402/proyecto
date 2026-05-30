@@ -1,8 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { cloudDownloadOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-list',
@@ -10,6 +8,7 @@ import { cloudDownloadOutline } from 'ionicons/icons';
   styleUrls: ['./list.component.scss'],
   standalone: true,
   imports: [CommonModule, IonicModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ListComponent {
   @Input() items: any[] = [];
@@ -22,13 +21,6 @@ export class ListComponent {
   @Output() delete = new EventEmitter<any>();
   @Output() onImportPlayer = new EventEmitter<any>();
 
-  constructor() {
-    addIcons({
-      'cloud-download-outline': cloudDownloadOutline,
-
-    });
-  }
-
   getStars(rating: any): number[] {
     if (!rating || isNaN(Number(rating))) {
       return [];
@@ -36,31 +28,19 @@ export class ListComponent {
     return Array(Math.floor(Number(rating))).fill(0);
   }
 
-  getInitials(name: string): string {
-    if (!name) return '??';
-    return name
-      .split(' ')
-      .map((w) => w[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  }
-
   selectItem(item: any) {
     this.onSelect.emit(item);
   }
 
-  editItem(item: any, event: Event) {
-    event.stopPropagation();
+  editItem(item: any) {
     this.edit.emit(item);
+  }
+
+  deleteItem(item: any) {
+    this.delete.emit(item);
   }
 
   importSinglePlayer(item: any) {
     this.onImportPlayer.emit(item);
-  }
-
-  deleteItem(item: any, event: Event) {
-    event.stopPropagation();
-    this.delete.emit(item);
   }
 }

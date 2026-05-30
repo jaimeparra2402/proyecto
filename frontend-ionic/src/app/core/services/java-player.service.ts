@@ -26,7 +26,6 @@ export class JavaPlayerService implements PlayerStrategy {
     return this.http.post<any>(this.apiUrl, player);
   }
 
-  // 🆕 AÑADIDO: Actualizar jugador
   updatePlayer(id: string, player: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, player);
   }

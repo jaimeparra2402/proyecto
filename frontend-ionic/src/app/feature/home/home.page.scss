@@ -1,58 +1,141 @@
-// Caja de saludo superior
-.user-greeting {
-  margin: 15px 0;
-  padding: 12px;
-  background-color: var(--ion-color-light, #f4f5f8);
-  border-radius: 8px;
-
-  h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-  }
-
-  p {
-    margin: 4px 0 0 0;
-    font-size: 0.85rem;
-    color: var(--ion-color-medium, #666);
-  }
+ion-content {
+  --background: linear-gradient(180deg, #0f3460 0%, #1a1a2e 100%);
 }
 
-// Títulos de secciones
-.section-title {
-  margin: 20px 0 10px 5px;
-  font-size: 0.85rem;
-  color: var(--ion-color-step-550, gray);
+.home-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &.admin-title {
-    color: var(--ion-color-danger, #eb445a);
-  }
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 10px 4px;
 }
 
-.button-grid {
+.menu-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
+}
 
-  ion-button {
-    --border-radius: 6px;
-    font-weight: 500;
+.menu-item {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+  text-align: left;
+
+  &:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  &.highlight {
+    background: rgba(162, 89, 255, 0.12);
+    border-color: rgba(162, 89, 255, 0.25);
+  }
+
+  &.danger {
+    background: rgba(233, 69, 96, 0.08);
+    border-color: rgba(233, 69, 96, 0.2);
+  }
+
+  .menu-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .menu-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+
+    &.teal {
+      background: rgba(0, 210, 255, 0.15);
+      color: #00d2ff;
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.15);
+    }
+
+    &.blue {
+      background: rgba(89, 142, 255, 0.15);
+      color: #598eff;
+      box-shadow: 0 0 16px rgba(89, 142, 255, 0.15);
+      font-size: 1.6rem;
+    }
+
+    &.orange {
+      background: rgba(245, 166, 35, 0.15);
+      color: #f5a623;
+      box-shadow: 0 0 16px rgba(245, 166, 35, 0.15);
+    }
+
+    &.purple {
+      background: rgba(162, 89, 255, 0.15);
+      color: #a259ff;
+      box-shadow: 0 0 16px rgba(162, 89, 255, 0.2);
+    }
+
+    &.red {
+      background: rgba(233, 69, 96, 0.15);
+      color: #e94560;
+      box-shadow: 0 0 16px rgba(233, 69, 96, 0.15);
+    }
+  }
+
+  .menu-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .menu-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .menu-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .menu-arrow {
+    font-size: 1.6rem;
+    color: rgba(255, 255, 255, 0.2);
+    line-height: 1;
+  }
+
+  .menu-badge {
+    background: linear-gradient(135deg, #a259ff, #7c3aed);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 8px;
   }
 }
 
-.section-divider {
-  border: 0;
-  border-top: 1px solid var(--ion-color-step-200, #ccc);
-  margin: 25px 0;
-}
-
-.logout-container {
+.admin-section {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  flex-direction: column;
 }

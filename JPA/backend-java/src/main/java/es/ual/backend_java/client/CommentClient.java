@@ -1,19 +1,24 @@
 package es.ual.backend_java.client;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "comments-service")
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@FeignClient(name = "comments-service", path = "/api/v1/comments")
 public interface CommentClient {
 
-    @GetMapping("/api/comments/player/{playerId}")
-    List<Map<String, Object>> obtenerComentariosPorJugador(@PathVariable("playerId") String playerId);
+    @PostMapping
+    Map<String, Object> crearComentario(@RequestBody Map<String, Object> comment);
 
-    @PostMapping("/api/comments")
-    Map<String, Object> crearComentario(@RequestBody Map<String, Object> comentario); // <-- Faltaba el @RequestBody
+    @GetMapping("/player/{playerId}")
+    List<Object> obtenerComentariosPorJugador(@PathVariable("playerId") String playerId);
 
-    @DeleteMapping("/api/comments/{commentId}")
-    void eliminarComentario(@PathVariable("commentId") String commentId);
+    @DeleteMapping("/{id}")
+    Map<String, Object> eliminarComentario(@PathVariable("id") String id);
 }

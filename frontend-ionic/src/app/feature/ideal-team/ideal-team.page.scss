@@ -1,92 +1,136 @@
+ion-content {
+  --background: linear-gradient(180deg, #0f3460 0%, #1a1a2e 100%);
+}
+
+p {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+.section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 1.5rem 0 0.75rem 4px;
+}
+
+ion-button[color="sparkles"] {
+  --background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  --background-activated: #6366f1;
+  --border-radius: 14px;
+  --box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+  --color: #ffffff;
+
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
 .main-loader {
   margin-top: 2rem;
+
+  ion-spinner {
+    transform: scale(1.2);
+    color: #8b5cf6;
+  }
+
   p {
-    color: var(--ion-color-step-600);
-    font-size: 0.95rem;
-    margin-top: 0.5rem;
+    margin-top: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
   }
 }
 
 .ai-container {
-  margin-top: 1.5rem;
+  animation: fadeUp 0.35s ease;
+}
 
-  .section-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--ion-color-dark);
-    margin-left: 0.5rem;
-    margin-bottom: 0.75rem;
+.formation-header {
+  margin-top: 1rem;
+}
+
+.formation-badge {
+  font-size: 1rem;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.player-card,
+.tactical-card {
+  --background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: none;
+  margin-bottom: 12px;
+}
+
+.player-content {
+  padding: 1.1rem;
+}
+
+.player-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.player-meta {
+  width: 100%;
+}
+
+.player-name {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.position-badge {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.player-reason {
+  margin-top: 12px;
+  margin-bottom: 0;
+
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tactical-card ion-card-content {
+  padding: 1.25rem;
+}
+
+.tactical-text {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+ion-color-danger,
+.error-box {
+  background: rgba(255, 71, 87, 0.12);
+  border: 1px solid rgba(255, 71, 87, 0.25);
+  border-radius: 14px;
+  color: #ff6b81;
+  margin-top: 1rem;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
 
-  .formation-header {
-    .formation-badge {
-      font-size: 1.1rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 20px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 10px rgba(var(--ion-color-success-rgb), 0.3);
-    }
-  }
-
-  .player-card {
-    margin: 0 0 0.75rem 0;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border-left: 4px solid var(--ion-color-secondary);
-
-    .player-content {
-      padding: 0.85rem 1rem;
-    }
-
-    .player-info-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .player-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .player-name {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--ion-color-dark);
-    }
-
-    .position-badge {
-      align-self: flex-start;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-    }
-
-    .player-reason {
-      margin: 0;
-      font-size: 0.9rem;
-      line-height: 1.35;
-      color: var(--ion-color-step-700);
-    }
-  }
-
-  .tactical-card {
-    margin: 0 0 1.5rem 0;
-    border-radius: 12px;
-    background: linear-gradient(to bottom, var(--ion-color-light), #ffffff);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-
-    .tactical-text {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: var(--ion-color-step-800);
-      text-align: justify;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,11 +1,8 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/player-list"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Añadir Jugador</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header
+  title="Añadir Jugador"
+  defaultHref="/player-list"
+  [showBackButton]="true">
+</app-header>
 
 <ion-content class="ion-padding">
   <ion-card>
@@ -20,7 +17,7 @@
 
       <ion-item class="ion-margin-bottom">
         <ion-select label="Liga *" labelPlacement="floating" placeholder="Selecciona una liga" [(ngModel)]="league">
-          <ion-select-option *ngFor="let l of leagues" [value]="l.value">
+          <ion-select-option *ngFor="let l of leagues" [value]="l.label">
             {{ l.label }}
           </ion-select-option>
         </ion-select>

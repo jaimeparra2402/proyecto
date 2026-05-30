@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { footballOutline, alertCircleOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-login',
@@ -18,8 +19,9 @@ import { footballOutline, alertCircleOutline, eyeOutline, eyeOffOutline } from '
   imports: [
     CommonModule, FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonInput,
-    IonButton, IonButtons, IonBackButton, IonIcon, IonSpinner, IonCard, IonCardContent
-  ]
+    IonButton, IonButtons, IonBackButton, IonIcon, IonSpinner, IonCard, IonCardContent,
+    HeaderComponent
+]
 })
 export class LoginPage {
   private authService = inject(AuthService);

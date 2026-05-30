@@ -15,6 +15,7 @@ import {
   IonIcon,
   IonBadge,
 } from '@ionic/angular/standalone';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-ideal-team',
@@ -35,7 +36,8 @@ import {
     IonCard,
     IonCardContent,
     IonSpinner,
-  ],
+    HeaderComponent
+],
 })
 export class IdealTeamPage implements OnInit {
   private playerFactory = inject(PlayerFactoryService);

@@ -12,7 +12,6 @@ on:
 
   workflow_dispatch:
 
-
 env:
   PROJECT_ID: cc-25-26
   SERVICE_NAME: frontend-ionic
@@ -37,11 +36,19 @@ jobs:
         cd frontend-ionic
         npm ci
 
-  #  - name: Run Unit Tests
-  #    run: |
-  #      cd frontend-ionic
-  #      npm run test -- --watch=false --code-coverage
+    - name: Run Unit Tests (Specs)
+      run: |
+        cd frontend-ionic
+        # Se añade --browsers=ChromeHeadless para que no intente abrir una ventana gráfica en el servidor de GitHub
+        npm run test -- --watch=false --code-coverage --browsers=ChromeHeadless
 
+    - name: Run Cypress E2E Tests (Chrome & Electron)
+      run: |
+        cd frontend-ionic
+        # 1. Levantamos el servidor de Ionic (ng serve) en el puerto 8100
+        # 2. Esperamos a que responda http://localhost:8100
+        # 3. Ejecutamos Cypress consecutivamente en Chrome y en Electron (el integrado de Cypress)
+        npx start-server-and-test 'npm start' http://localhost:8100 'npx cypress run --browser chrome && npx cypress run --browser electron'
 
     - name: Run Static Code Analysis (Linter)
       run: |

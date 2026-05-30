@@ -1,53 +1,56 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Listado Completo</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header
+  title="Listado Completo"
+  defaultHref="/landing">
+</app-header>
 
 <ion-content class="ion-padding grey-background">
-  
   <div class="search-container ion-margin-bottom">
     <h2 class="search-title">Filtros de Búsqueda</h2>
-    
+
     <div class="filter-box">
       <div class="input-wrapper">
         <ion-icon name="person-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="Nombre del jugador" 
-          labelPlacement="floating" 
-          type="text" 
-          [(ngModel)]="searchName" 
-          placeholder="Ej: Sergio Ramos">
+        <ion-input
+          label="Nombre del jugador"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="searchName"
+          placeholder="Ej: Sergio Ramos"
+        >
         </ion-input>
       </div>
 
       <div class="input-wrapper">
         <ion-icon name="shield-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="Equipo o Liga" 
-          labelPlacement="floating" 
-          type="text" 
-          [(ngModel)]="searchTeam" 
-          placeholder="Ej: Real Madrid o LaLiga">
+        <ion-input
+          label="Equipo o Liga"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="searchTeam"
+          placeholder="Ej: Real Madrid o LaLiga"
+        >
         </ion-input>
       </div>
 
       <div class="input-wrapper">
         <ion-icon name="calendar-clear-outline" class="input-icon"></ion-icon>
-        <ion-input 
-          label="Dado de alta desde" 
-          labelPlacement="floating" 
-          type="date" 
-          [(ngModel)]="searchDate">
+        <ion-input
+          label="Dado de alta desde"
+          labelPlacement="floating"
+          type="date"
+          [(ngModel)]="searchDate"
+        >
         </ion-input>
       </div>
     </div>
 
     <div class="action-buttons-group">
-      <ion-button class="btn-clear" fill="clear" color="medium" (click)="clearFilters()">
+      <ion-button
+        class="btn-clear"
+        fill="clear"
+        color="medium"
+        (click)="clearFilters()"
+      >
         <ion-icon name="refresh-outline" slot="start"></ion-icon>
         Limpiar
       </ion-button>
@@ -68,7 +71,10 @@
   >
   </app-list>
 
-  <div *ngIf="players.length === 0" class="ion-text-center ion-padding no-results-box">
+  <div
+    *ngIf="players.length === 0"
+    class="ion-text-center ion-padding no-results-box"
+  >
     <ion-icon name="alert-circle-outline" class="no-results-icon"></ion-icon>
     <p>No se encontraron resultados para los filtros aplicados.</p>
   </div>

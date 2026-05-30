@@ -1,6 +1,5 @@
 const Player = require('../models/Player');
 
-// 1. BUSCAR JUGADORES EN LA API EXTERNA
 exports.searchExternalPlayers = async (req, res) => {
   try {
     const { search, league, season } = req.query;
@@ -8,13 +7,11 @@ exports.searchExternalPlayers = async (req, res) => {
       return res.status(400).json({ status: 'fail', message: 'Missing search query' });
     }
 
-    // La API exige una temporada concreta para buscar jugadores por texto
     const currentSeason = season || '2025'; 
     let url = `https://v3.football.api-sports.io/players?search=${encodeURIComponent(search)}&season=${currentSeason}`;
     
     if (league) url += `&league=${league}`;
 
-    // Hacemos la petición HTTP hacia la API externa usando fetch nativo de Node
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -31,7 +28,6 @@ exports.searchExternalPlayers = async (req, res) => {
 
     const rawResponse = data.response || [];
 
-    // Mapeamos y simplificamos el resultado para enviárselo mascadito a tu app de Ionic
     const formattedPlayers = rawResponse.map(item => ({
       name: `${item.player.firstname} ${item.player.lastname}`,
       team: item.statistics[0]?.team?.name || 'Desconocido',

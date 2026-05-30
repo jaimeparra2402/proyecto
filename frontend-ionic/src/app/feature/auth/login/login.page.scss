@@ -1,60 +1,100 @@
+ion-content {
+  --background: linear-gradient(180deg, #0f3460 0%, #1a1a2e 100%);
+}
+
 .auth-header {
   text-align: center;
   padding: 2rem 0 1.5rem;
 
-  .auth-icon {
-    font-size: 56px;
-    color: var(--ion-color-primary);
-  }
-
   h2 {
-    font-size: 22px;
-    font-weight: 600;
-    margin: 0.5rem 0 0.25rem;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 0.5rem;
   }
 
   p {
-    font-size: 14px;
-    color: var(--ion-color-medium);
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.9rem;
     margin: 0;
   }
 }
 
 .auth-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: none;
+
+  ion-card-content {
+    padding: 1.5rem;
+  }
+
+  ion-item {
+    --background: rgba(255, 255, 255, 0.06);
+    --border-color: transparent;
+    --border-radius: 12px;
+    --color: #ffffff;
+    --padding-start: 14px;
+    border-radius: 12px;
+    margin-bottom: 4px;
+
+    &.item-error {
+      --background: rgba(233, 69, 96, 0.1);
+      border: 1px solid rgba(233, 69, 96, 0.3);
+    }
+
+    ion-input {
+      --color: #ffffff;
+      --placeholder-color: rgba(255, 255, 255, 0.3);
+
+      &::part(label) {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.82rem;
+      }
+    }
+
+    ion-button {
+      --color: rgba(255, 255, 255, 0.4);
+    }
+  }
 }
 
 .field-error {
-  font-size: 12px;
-  color: var(--ion-color-danger);
-  margin: 4px 0 0 16px;
+  color: #e94560;
+  font-size: 0.75rem;
+  margin: 2px 0 8px 4px;
 }
 
 .error-message {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
+  background: rgba(233, 69, 96, 0.12);
+  border: 1px solid rgba(233, 69, 96, 0.25);
+  border-radius: 10px;
   padding: 10px 14px;
-  border-radius: 8px;
-  background: var(--ion-color-danger-tint);
-  color: var(--ion-color-danger);
-  font-size: 14px;
+  color: #e94560;
+  font-size: 0.85rem;
+  margin-top: 1rem;
 
-  ion-icon { font-size: 18px; flex-shrink: 0; }
-}
-
-.item-error {
-  --border-color: var(--ion-color-danger);
+  ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
 }
 
 .main-btn {
+  --background: linear-gradient(135deg, #e94560, #c0392b);
+  --background-activated: #c0392b;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 15px rgba(233, 69, 96, 0.35);
+  font-weight: 700;
   margin-top: 1.5rem;
-  --border-radius: 10px;
 }
 
 .secondary-btn {
+  --color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
   margin-top: 0.5rem;
-  font-size: 14px;
 }

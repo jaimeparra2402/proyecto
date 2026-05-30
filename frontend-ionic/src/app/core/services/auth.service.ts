@@ -20,23 +20,15 @@ export class AuthService {
 
   private backendUrl = `${environment.apiNode}/users`;
 
-  // Autenticación de Usuario de Firebase
   public user$ = user(this.auth);
   public currentUser = toSignal(this.user$);
 
-  // Control de estado clásico para compatibilidad reactiva interna
   private isAdminSubject = new BehaviorSubject<boolean>(false);
   public isAdmin$ = this.isAdminSubject.asObservable();
 
-  /**
-   * 🌟 EL SALVADOR DE LA NAVEGACIÓN: Signal Reactivo Avanzado.
-   * Al transformarlo en Signal, cualquier HTML de la app que lo use (con paréntesis)
-   * se actualizará automáticamente y mantendrá el valor vivo durante toda la sesión.
-   */
   public isSystemAdmin = toSignal(this.isAdmin$, { initialValue: false });
 
   constructor() {
-    // Rehidratación inmediata del estado al instanciar el servicio (Evita caídas por F5)
     const savedRole = localStorage.getItem('userRole');
     if (savedRole === 'admin') {
       this.isAdminSubject.next(true);
@@ -50,10 +42,9 @@ export class AuthService {
       password,
     );
 
-    // Validación estricta basada en el correo elegido
     if (email.toLowerCase() === 'admin@gmail.com') {
       this.isAdminSubject.next(true);
-      localStorage.setItem('userRole', 'admin'); // Persistencia en navegador
+      localStorage.setItem('userRole', 'admin'); 
     } else {
       this.isAdminSubject.next(false);
       localStorage.removeItem('userRole');
@@ -72,7 +63,6 @@ export class AuthService {
       password,
     );
 
-    // Por seguridad, un usuario registrado públicamente nunca inicia como admin
     this.isAdminSubject.next(false);
     localStorage.removeItem('userRole');
 
@@ -100,7 +90,6 @@ export class AuthService {
       return userCredential.user;
     }
   }
-  // Añade esto en tu auth.service.ts
     async getActiveToken(): Promise<string | null> {
       if (this.auth.currentUser) {
         return await this.auth.currentUser.getIdToken();
@@ -109,7 +98,7 @@ export class AuthService {
     }
   async logout() {
     this.isAdminSubject.next(false);
-    localStorage.removeItem('userRole'); // Limpieza absoluta de la memoria
+    localStorage.removeItem('userRole'); 
     return signOut(this.auth);
   }
 
@@ -117,7 +106,6 @@ export class AuthService {
     return this.auth.currentUser?.uid;
   }
 
-  // Mantenemos este método por si alguna lógica de TypeScript antigua aún lo llama de forma síncrona
   isUserAdmin(): boolean {
     return (
       this.isAdminSubject.value || localStorage.getItem('userRole') === 'admin'

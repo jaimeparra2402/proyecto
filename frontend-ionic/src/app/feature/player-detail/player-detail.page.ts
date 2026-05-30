@@ -29,6 +29,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { star, starOutline, chatbubbleEllipsesOutline } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-player-detail',
@@ -57,8 +58,9 @@ import { star, starOutline, chatbubbleEllipsesOutline } from 'ionicons/icons';
     IonTextarea,
     IonSelect,
     IonSelectOption,
-    IonIcon
-  ],
+    IonIcon,
+    HeaderComponent
+],
 })
 export class PlayerDetailPage implements OnInit {
   private route = inject(ActivatedRoute);

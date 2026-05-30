@@ -29,6 +29,7 @@ import {
   checkmarkDoneOutline,
   starOutline
 } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-edit-player',
@@ -49,8 +50,9 @@ import {
     IonIcon,
     IonSelect,
     IonSelectOption,
-    IonSpinner
-  ]
+    IonSpinner,
+    HeaderComponent
+]
 })
 export class EditPlayerPage implements OnInit {
   private route = inject(ActivatedRoute);
@@ -95,7 +97,7 @@ export class EditPlayerPage implements OnInit {
             name: data.name,
             team: data.team,
             league: data.league || '',
-            position: this.formatPosition(data.position), // 👈 Mapea el string al formato del Selector
+            position: this.formatPosition(data.position), 
             imageUrl: data.imageUrl || data.image || '',
             latitude: data.latitude,
             longitude: data.longitude,
@@ -113,9 +115,6 @@ export class EditPlayerPage implements OnInit {
       });
   }
 
-  /**
-   * Normaliza la posición de la base de datos para que coincida con los values del HTML
-   */
   formatPosition(pos: string): string {
     if (!pos) return 'GK';
     const cleanPos = pos.trim().toUpperCase();
@@ -132,7 +131,6 @@ export class EditPlayerPage implements OnInit {
       return;
     }
 
-    // Convertimos las estadísticas explícitamente a números antes de enviarlas al backend
     const updatedData = {
       ...this.player,
       stats: {

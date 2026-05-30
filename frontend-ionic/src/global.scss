@@ -17,7 +17,7 @@
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-@import 'leaflet/dist/leaflet.css';
+@import "leaflet/dist/leaflet.css";
 
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
@@ -35,4 +35,115 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+.custom-header {
+  ion-toolbar {
+    --background: linear-gradient(
+      135deg,
+      #1a1a2e 0%,
+      #16213e 50%,
+      #0f3460 100%
+    );
+    --color: #ffffff;
+    --border-width: 0;
+    --min-height: 60px;
+    padding: 0 4px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #e94560, #f5a623, #00d2ff);
+    }
+
+    ion-title {
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: auto !important;
+      max-width: 60% !important;
+      text-align: center !important;
+      font-size: 1.5rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.5px !important;
+      color: #ffffff !important;
+      text-shadow: 0 0 20px rgba(233, 69, 96, 0.4) !important;
+      padding: 0 !important;
+      top: 50% !important;
+      transform: translateX(-50%) translateY(-50%) !important;
+    }
+  }
+
+  .header-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 60%;
+    text-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+  }
+
+  .back-btn {
+    --color: #00d2ff;
+    --icon-font-size: 22px;
+    filter: drop-shadow(0 0 4px rgba(0, 210, 255, 0.5));
+  }
+
+  .user-info-btn {
+    --color: rgba(255, 255, 255, 0.75);
+    font-size: 0.8rem;
+    opacity: 1 !important;
+
+    ion-icon {
+      color: #f5a623;
+      font-size: 18px;
+    }
+
+    ion-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      margin-left: 4px;
+    }
+  }
+
+  .logout-btn {
+    --color: #e94560;
+
+    ion-icon {
+      font-size: 22px;
+      filter: drop-shadow(0 0 4px rgba(233, 69, 96, 0.5));
+    }
+
+    &:hover {
+      --color: #ff6b6b;
+    }
+  }
+
+  .login-btn {
+    --color: #00d2ff;
+
+    ion-icon {
+      font-size: 18px;
+    }
+
+    ion-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    &:hover {
+      --color: #7efff5;
+    }
+  }
+}

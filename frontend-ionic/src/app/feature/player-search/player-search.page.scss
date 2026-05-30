@@ -1,17 +1,108 @@
+ion-content {
+  --background: linear-gradient(180deg, #0f3460 0%, #1a1a2e 100%);
+}
+
 .search-card {
-  border-radius: 16px;
+  --background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+
+  ion-card-content {
+    padding: 1.25rem;
+  }
+}
+
+ion-searchbar {
+  --background: rgba(255, 255, 255, 0.06);
+  --color: #ffffff;
+  --placeholder-color: rgba(255, 255, 255, 0.35);
+  --icon-color: rgba(255, 255, 255, 0.6);
+  --clear-button-color: rgba(255, 255, 255, 0.6);
+
+  padding: 0;
+  margin-bottom: 1rem;
+  border-radius: 14px;
 }
 
 .custom-select {
-  width: 100%;
-  margin-top: 8px;
+  margin-bottom: 12px;
+
+  --background: rgba(255, 255, 255, 0.06);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-radius: 14px;
+  --color: #ffffff;
+  --placeholder-color: rgba(255, 255, 255, 0.35);
+  --highlight-color-focused: #4da3ff;
+  --padding-start: 14px;
+  --padding-end: 14px;
 }
 
 .hint-text {
-  font-size: 12px;
-  color: var(--ion-color-medium);
-  margin: 8px 0 0;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.78rem;
+  line-height: 1.5;
+
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+}
+
+ion-button {
+  --background: linear-gradient(135deg, #4da3ff, #2563eb);
+  --background-activated: #2563eb;
+  --border-radius: 14px;
+  --box-shadow: 0 4px 15px rgba(77, 163, 255, 0.25);
+
+  height: 48px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+ion-button.button-disabled {
+  --background: rgba(255, 255, 255, 0.08);
+  --color: rgba(255, 255, 255, 0.35);
+  --box-shadow: none;
+}
+
+ion-spinner {
+  transform: scale(1.1);
+  color: #4da3ff;
+}
+
+.empty-state {
+  margin-top: 2rem;
+
+  p {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.95rem;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1rem;
+    border-radius: 14px;
+    display: inline-block;
+  }
+}
+
+app-list {
+  display: block;
+  animation: fadeUp 0.25s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -22,6 +22,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ListComponent } from '../../shared/list/list.component';
 import { LEAGUES, SEASONS } from '../../core/constants/leagues.constants';
+import { HeaderComponent } from "src/app/shared/header/header.component";
 
 @Component({
   selector: 'app-player-search',
@@ -46,7 +47,8 @@ import { LEAGUES, SEASONS } from '../../core/constants/leagues.constants';
     IonButton,
     IonIcon,
     ListComponent,
-  ],
+    HeaderComponent
+],
 })
 export class PlayerSearchPage {
   private playerService = inject(NodePlayerService);
