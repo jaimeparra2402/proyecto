@@ -4,7 +4,6 @@
 module.exports = function (config) {
   config.set({
     basePath: '',
-    browsers: ['ChromeHeadless'],
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
       require('karma-jasmine'),
@@ -41,14 +40,21 @@ module.exports = function (config) {
     
     browsers: ['ChromeHeadlessNoSandbox'],
 
+    browsers: ['ChromeHeadlessCI'],
     customLaunchers: {
-      ChromeHeadlessNoSandbox: {
+      ChromeHeadlessCI: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--disable-setuid-sandbox']
+        flags: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--remote-debugging-port=9222'
+        ]
       }
     },
 
-    singleRun: false,
+    singleRun: true,
     restartOnFileChange: true
   });
 };

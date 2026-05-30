@@ -42,7 +42,7 @@ public class PlayerController {
     @Value("${api.football.key}")
     private String apiFootballKey;
 
-    @Value("${gemini.api.key}")
+    @Value("${gemini.api.key:mock-key-for-testing}")
     private String geminiApiKey;
 
     @GetMapping("/players")

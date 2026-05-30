@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'JPA/backend-java/**'
+      - 'JPA/**'
   pull_request:
     branches: [ main ]
     paths:

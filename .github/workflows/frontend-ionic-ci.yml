@@ -39,8 +39,8 @@ jobs:
     - name: Run Unit Tests (Specs)
       run: |
         cd frontend-ionic
-        # Se añade --browsers=ChromeHeadless para que no intente abrir una ventana gráfica en el servidor de GitHub
-        npm run test -- --watch=false --code-coverage --browsers=ChromeHeadless
+        # Forzamos a que no use progreso visual y maneje correctamente el single-run
+        npm run test -- --no-watch --no-progress --browsers=ChromeHeadless
 
     - name: Run Cypress E2E Tests (Chrome & Electron)
       run: |
