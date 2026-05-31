@@ -50,7 +50,7 @@ jobs:
 
         # 3. Start server + tests
         npx start-server-and-test \
-          "npx ionic serve --port 8100 --no-open" \
+          "npx ng serve --port 8100 --no-open" \
           http://localhost:8100 \
           "npx cypress run --browser chrome && npx cypress run --browser electron"
 
