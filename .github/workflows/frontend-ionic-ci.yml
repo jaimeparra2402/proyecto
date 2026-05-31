@@ -41,16 +41,16 @@ jobs:
         # 1. Compilar la librería list primero
         cd list
         npm install
-        npm run build      
+        npm run build
 
-        # 2. Ahora compilar el frontend
+        # 2. Compilar el frontend
         cd ../frontend-ionic
         npm install
         npx ng build
 
         # 3. Start server + tests
         npx start-server-and-test \
-          "npm start" \
+          "npx ionic serve --port 8100 --no-open" \
           http://localhost:8100 \
           "npx cypress run --browser chrome && npx cypress run --browser electron"
 
