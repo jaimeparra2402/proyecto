@@ -36,13 +36,21 @@ jobs:
         cd frontend-ionic
         npm ci
 
-    - name: Run Cypress E2E Tests (Chrome & Electron)
+    - name: Build + Run Cypress E2E Tests (Chrome & Electron)
       run: |
         cd frontend-ionic
-        # 1. Levantamos el servidor de Ionic (ng serve) en el puerto 8100
-        # 2. Esperamos a que responda http://localhost:8100
-        # 3. Ejecutamos Cypress consecutivamente en Chrome y en Electron (el integrado de Cypress)
-        npx start-server-and-test 'npm start' http://localhost:8100 'npx cypress run --browser chrome && npx cypress run --browser electron'
+
+        # 1. instalar deps
+        npm install
+
+        # 2. IMPORTANTE: compilar lo que falta (evita error dist/)
+        ng build
+
+        # 3. levantar server + tests
+        npx start-server-and-test \
+          "npm start" \
+          http://localhost:8100 \
+          "npx cypress run --browser chrome && npx cypress run --browser electron"
 
     - name: Run Static Code Analysis (Linter)
       run: |
