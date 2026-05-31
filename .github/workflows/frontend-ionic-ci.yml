@@ -44,7 +44,7 @@ jobs:
         npm install
 
         # 2. IMPORTANTE: compilar lo que falta (evita error dist/)
-        ng build
+        npx ng build
 
         # 3. levantar server + tests
         npx start-server-and-test \
