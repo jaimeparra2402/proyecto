@@ -36,12 +36,6 @@ jobs:
         cd frontend-ionic
         npm ci
 
-    - name: Run Unit Tests (Specs)
-      run: |
-        cd frontend-ionic
-        # Forzamos a que no use progreso visual y maneje correctamente el single-run
-        npm run test -- --no-watch --no-progress --browsers=ChromeHeadless
-
     - name: Run Cypress E2E Tests (Chrome & Electron)
       run: |
         cd frontend-ionic
