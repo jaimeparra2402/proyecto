@@ -16,7 +16,7 @@
       </ion-item>
 
       <ion-item class="ion-margin-bottom">
-        <ion-select label="Liga *" labelPlacement="floating" placeholder="Selecciona una liga" [(ngModel)]="league">
+        <ion-select interface="popover" label="Liga *" labelPlacement="floating" placeholder="Selecciona una liga" [(ngModel)]="league">
           <ion-select-option *ngFor="let l of leagues" [value]="l.label">
             {{ l.label }}
           </ion-select-option>
@@ -24,7 +24,7 @@
       </ion-item>
 
       <ion-item class="ion-margin-bottom">
-        <ion-select label="Posición *" labelPlacement="floating" placeholder="Selecciona posición" [(ngModel)]="position">
+        <ion-select interface="popover" label="Posición *" labelPlacement="floating" placeholder="Selecciona posición" [(ngModel)]="position">
           <ion-select-option value="Goalkeeper">Goalkeeper</ion-select-option>
           <ion-select-option value="Defender">Defender</ion-select-option>
           <ion-select-option value="Midfielder">Midfielder</ion-select-option>

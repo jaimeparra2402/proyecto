@@ -54,7 +54,7 @@ export class HomePage {
   }
 
   goToViewNews() {
-    this.router.navigate(['/view-news-corba']);
+    this.router.navigate(['/news']);
   }
 
   goToPlayerList() {

@@ -76,13 +76,13 @@ exports.deletePlayer = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-    const { text, rating, latitude, longitude, username } = req.body; 
+    const { text, rating, latitude, longitude, author } = req.body; 
     const player = await Player.findById(req.params.id);
     
     if (!player) return res.status(404).json({ status: 'fail', message: 'Jugador no encontrado' });
 
     const newComment = {
-      author: username || 'Anónimo',
+      author: author || 'Anónimo',
       text,
       rating,
       latitude,   

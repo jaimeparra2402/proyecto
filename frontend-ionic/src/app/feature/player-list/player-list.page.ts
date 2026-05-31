@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlayerFactoryService } from '../../core/services/player-factory.service';
@@ -31,11 +31,13 @@ import {
 } from 'ionicons/icons';
 import { HeaderComponent } from "src/app/shared/header/header.component";
 
+
 @Component({
   selector: 'app-player-list',
   templateUrl: './player-list.page.html',
   styleUrls: ['./player-list.page.scss'],
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     FormsModule,

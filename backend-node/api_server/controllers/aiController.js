@@ -54,7 +54,7 @@ exports.generateIdealTeam = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('💥 Error en el generador de IA:', error.message);
+    console.error('Error en el generador de IA:', error.message);
     res.status(500).json({
       status: 'error',
       message: 'Error al generar el equipo ideal con el LLM: ' + error.message

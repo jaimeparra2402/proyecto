@@ -1,4 +1,4 @@
-package com.proyecto.corba;
+package es.ual.backend_java.Corba.corba;
 
 import CorbaModulo.ServicioNoticias;
 import CorbaModulo.ServicioNoticiasHelper;

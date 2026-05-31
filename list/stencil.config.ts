@@ -6,9 +6,10 @@ export const config: Config = {
     {
       type: 'dist',
       esmLoaderPath: '../loader',
+      copy: []
     },
     {
-      type: 'dist-custom-elements',
+      type: 'dist-custom-elements',  
       customElementsExportBehavior: 'auto-define-custom-elements',
       externalRuntime: false,
     },
@@ -17,7 +18,7 @@ export const config: Config = {
     },
     {
       type: 'www',
-      serviceWorker: null, // disable service workers
+      serviceWorker: null,
     },
   ],
 };

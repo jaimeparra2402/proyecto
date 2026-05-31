@@ -12,7 +12,8 @@ describe('HomePage (Pruebas Unitarias)', () => {
 
   beforeEach(async () => {
     mockAuthService = {
-      currentUser: jasmine.createSpy('currentUser').and.returnValue({ email: 'jaime.test@correo.com' }),
+      currentUser: { email: 'jaime.test@correo.com' },
+      isSystemAdmin: jasmine.createSpy('isSystemAdmin').and.returnValue(false),
       logout: jasmine.createSpy('logout').and.returnValue(Promise.resolve())
     };
 

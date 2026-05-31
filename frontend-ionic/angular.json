@@ -30,10 +30,12 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               {
                 "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
+                "input": "node_modules/list/dist/list",
+                "output": "/list/"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],

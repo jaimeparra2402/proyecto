@@ -1,0 +1,20 @@
+module com {
+  module proyecto {
+    module corba {
+
+      struct Noticia {
+        string id;
+        string jugadorId;
+        string titulo;
+        string cuerpo;
+        string fechaCreacion;
+      };
+
+      interface ServicioNoticias {
+        void publicarNoticia(in Noticia noticia);
+        Noticia obtenerNoticia(in string id);
+      };
+
+    };
+  };
+};

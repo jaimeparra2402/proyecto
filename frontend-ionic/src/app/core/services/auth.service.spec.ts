@@ -104,9 +104,7 @@ describe('AuthService (Pruebas Unitarias)', () => {
       service.registerInFirebaseAndBackend('nuevo_usuario@gmail.com', 'passValid777')
         .then(res => backendResponse = res);
 
-      tick(); // Resuelve la creación en Firebase y el IdToken
-
-      // Interceptamos la llamada HTTP obligatoria al backend de Node
+      tick();
       const req = httpMock.expectOne(`${environment.apiNode}/users/register`);
       expect(req.request.method).toBe('POST');
       expect(req.request.headers.get('Authorization')).toBe('Bearer mock-firebase-token');
@@ -134,7 +132,7 @@ describe('AuthService (Pruebas Unitarias)', () => {
       tick();
 
       const req = httpMock.expectOne(`${environment.apiNode}/users/register`);
-      req.error(new ErrorEvent('Network Error')); // Simulamos caída del backend
+      req.error(new ErrorEvent('Network Error')); 
       tick();
 
       expect(console.warn).toHaveBeenCalled();

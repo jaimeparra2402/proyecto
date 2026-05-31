@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PlayerStrategy } from './player.strategy';
 import { environment } from '../../../environments/environment';
-import { Observable, from } from 'rxjs'; // 👈 1. CORRECCIÓN: Añadido 'from' aquí
+import { Observable, from } from 'rxjs'; 
 import { switchMap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 @Injectable({
@@ -61,7 +61,7 @@ export class JavaPlayerService implements PlayerStrategy {
     league?: string;
     season?: string;
   }): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/external/search-player`, {
+    return this.http.get<any>(`${environment.apiJava}/external/search-player`, {
       params: searchParams,
     });
   }
@@ -71,10 +71,19 @@ export class JavaPlayerService implements PlayerStrategy {
     latitude?: number;
     longitude?: number;
   }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/external/import`, importData);
+    return this.http.post<any>(`${environment.apiJava}external/import`, importData);
   }
 
   getEquipoIdeal(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/external/equipo-ideal`);
+    return this.http.get<any>(`${environment.apiJava}/external/equipo-ideal`);
+  }
+  
+  getNews(playerId?: string): Observable<any> {
+    const params: any = playerId ? { playerId } : {};
+    return this.http.get<any>(`${this.apiUrl}/news`, { params });
+  }
+
+  createNews(news: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/news`, news);
   }
 }

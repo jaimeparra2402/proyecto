@@ -17,6 +17,10 @@
       "import": "./dist/components/my-component.js",
       "types": "./dist/components/my-component.d.ts"
     },
+    "./player-row-item": {
+      "import": "./dist/components/player-row-item.js",
+      "types": "./dist/components/player-row-item.d.ts"
+    },
     "./loader": {
       "import": "./loader/index.js",
       "require": "./loader/index.cjs",

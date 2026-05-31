@@ -3,48 +3,76 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: 'landing',
-    loadComponent: () => import('./feature/landing/landing.page').then((m) => m.LandingPage),
+    loadComponent: () =>
+      import('./feature/landing/landing.page').then((m) => m.LandingPage),
   },
   {
     path: 'player-list',
-    loadComponent: () => import('./feature/player-list/player-list.page').then((m) => m.PlayerListPage),
+    loadComponent: () =>
+      import('./feature/player-list/player-list.page').then(
+        (m) => m.PlayerListPage
+      ),
   },
   {
     path: 'player-search',
-    loadComponent: () => import('./feature/player-search/player-search.page').then((m) => m.PlayerSearchPage),
+    loadComponent: () =>
+      import('./feature/player-search/player-search.page').then(
+        (m) => m.PlayerSearchPage
+      ),
   },
   {
     path: 'home',
-    loadComponent: () => import('./feature/home/home.page').then((m) => m.HomePage),
+    loadComponent: () =>
+      import('./feature/home/home.page').then((m) => m.HomePage),
   },
   {
-  path: 'player-detail/:id', 
-  loadComponent: () => import('./feature/player-detail/player-detail.page').then((m) => m.PlayerDetailPage),
-},
+    path: 'player-detail/:id',
+    loadComponent: () =>
+      import('./feature/player-detail/player-detail.page').then(
+        (m) => m.PlayerDetailPage
+      ),
+  },
   {
     path: 'register',
-    loadComponent: () => import('./feature/auth/register/register.page').then((m) => m.RegisterPage),
+    loadComponent: () =>
+      import('./feature/auth/register/register.page').then(
+        (m) => m.RegisterPage
+      ),
   },
   {
     path: 'login',
-    loadComponent: () => import('./feature/auth/login/login.page').then((m) => m.LoginPage),
+    loadComponent: () =>
+      import('./feature/auth/login/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'add-player',
-    loadComponent: () => import('./feature/add-player/add-player.page').then((m) => m.AddPlayerPage),
+    loadComponent: () =>
+      import('./feature/add-player/add-player.page').then(
+        (m) => m.AddPlayerPage
+      ),
   },
   {
     path: 'ideal-team',
-    loadComponent: () => import('./feature/ideal-team/ideal-team.page').then((m) => m.IdealTeamPage),
+    loadComponent: () =>
+      import('./feature/ideal-team/ideal-team.page').then(
+        (m) => m.IdealTeamPage
+      ),
   },
   {
     path: 'edit-player/:id',
-    loadComponent: () => import('./feature/edit-player/edit-player.page').then( m => m.EditPlayerPage)
+    loadComponent: () =>
+      import('./feature/edit-player/edit-player.page').then(
+        (m) => m.EditPlayerPage
+      ),
+  },
+  {
+    path: 'news',
+    loadComponent: () =>
+      import('./feature/news/news.page').then((m) => m.NewsPage),
   },
   {
     path: '',
     redirectTo: 'landing',
     pathMatch: 'full',
-  } 
-
+  },
 ];

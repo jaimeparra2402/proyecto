@@ -5,7 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,6 +32,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.ual.backend_java.Corba.corba.ServicioNoticias;
+import es.ual.backend_java.Corba.corba.ServicioNoticiasHelper;
 import es.ual.backend_java.model.Comment;
 import es.ual.backend_java.model.Player;
 import es.ual.backend_java.repository.PlayerRepository;
@@ -35,6 +42,33 @@ import es.ual.backend_java.repository.PlayerRepository;
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class PlayerController {
+	
+	private ServicioNoticias servicioNoticias;
+
+	private ServicioNoticias getCorbaService() {
+	    if (servicioNoticias == null) {
+	        try {
+	            Properties props = new Properties();
+	            props.put("org.omg.CORBA.ORBInitialPort", "1050");
+	            props.put("org.omg.CORBA.ORBInitialHost", "localhost");
+
+	            ORB orb = ORB.init(new String[]{}, props);
+
+	            org.omg.CORBA.Object objRef =
+	                    orb.resolve_initial_references("NameService");
+
+	            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+	            NameComponent[] path = ncRef.to_name("ServicioNoticias");
+
+	            servicioNoticias = ServicioNoticiasHelper.narrow(ncRef.resolve(path));
+
+	        } catch (Exception e) {
+	            throw new RuntimeException("Error conectando CORBA", e);
+	        }
+	    }
+	    return servicioNoticias;
+	}
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -519,10 +553,14 @@ public class PlayerController {
             }
 
             String prompt = "Eres un director tecnico de futbol. " +
-                    "Elige el equipo ideal de 11 jugadores con formacion 4-3-3 o 4-4-2.\n\n" +
-                    playersListForAI.toString() +
-                    "\n\nDevuelve SOLO un JSON sin texto adicional ni markdown:\n" +
-                    "{\"formacion\":\"4-3-3\",\"jugadores\":[{\"nombre\":\"...\",\"posicion\":\"...\"}],\"explicacion\":\"...\"}";
+            	    "Elige el equipo ideal de 11 jugadores con formacion 4-3-3 o 4-4-2.\n\n" +
+            	    playersListForAI.toString() +
+            	    "\n\nDevuelve SOLO un JSON sin texto adicional ni markdown con esta estructura exacta:\n" +
+            	    "{" +
+            	    "\"formacion\":\"4-3-3\"," +
+            	    "\"once_ideal\":[{\"nombre\":\"...\",\"posicion\":\"...\",\"motivo\":\"...\"}]," +
+            	    "\"analisis_tactico\":\"...\"" +
+            	    "}";
 
             Map<String, Object> part = new HashMap<>();
             part.put("text", prompt);
@@ -533,7 +571,8 @@ public class PlayerController {
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("contents", List.of(content));
 
-            String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + geminiApiKey;
+            String geminiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key=" + geminiApiKey;
+
 
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Map> geminiResponse = restTemplate.postForEntity(geminiUrl, requestBody, Map.class);
@@ -569,6 +608,56 @@ public class PlayerController {
             respuestaFinal.put("status", "error");
             respuestaFinal.put("message", "Error al generar el equipo ideal: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuestaFinal);
+        }
+    }
+    
+    @PostMapping("/news")
+    public ResponseEntity<Map<String, Object>> crearNoticia(@RequestBody Map<String, String> body) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String idJugador = body.get("idJugador");
+            String titulo = body.get("titulo");
+            String noticia = body.get("noticia");
+
+            es.ual.backend_java.Corba.corba.Noticia n = new es.ual.backend_java.Corba.corba.Noticia();
+            n.id = idJugador;
+            n.titulo = titulo;
+            n.cuerpo = noticia;
+            n.fechaCreacion = java.time.LocalDateTime.now().toString();
+
+            getCorbaService().publicarNoticia(n);
+
+            response.put("status", "success");
+            response.put("message", "Noticia publicada en CORBA");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    @GetMapping("/news/{id}")
+    public ResponseEntity<Map<String, Object>> obtenerNoticia(@PathVariable String id) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+        	es.ual.backend_java.Corba.corba.Noticia noticia = getCorbaService().obtenerNoticia(id);
+
+            response.put("status", "success");
+            response.put("data", noticia);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

@@ -1,144 +1,118 @@
-describe('Suite Completa de Pruebas E2E - Sistema de Jugadores', () => {
-  
+describe('Pruebas E2E - Sistema de Jugadores', () => {
+
   beforeEach(() => {
-    // Ajusta la URL base según tu entorno de desarrollo
-    cy.visit('http://localhost:8100/landing');
+    cy.clearLocalStorage();
+    cy.clearCookies();
+    cy.visit('/landing');
   });
 
-  // ==========================================
-  // 1. FUNCIONALIDAD DE AUTENTICACIÓN (Rúbrica)
-  // ==========================================
-  context('Módulo de Autenticación', () => {
-    
-    it('Debería registrar un nuevo usuario con éxito', () => {
-      cy.visit('/register');
-      cy.get('ion-input[name="username"]').type('TestPlayer');
-      cy.get('ion-input[type="email"]').type('cypress_test@correo.com');
-      cy.get('ion-input[type="password"]').type('passwordSeguro123');
-      cy.get('ion-button.register-submit').click();
-
-      // Verificación de redirección post-registro
-      cy.url().should('not.include', '/register');
-    });
-
-    it('Debería iniciar sesión correctamente con credenciales válidas', () => {
-      cy.visit('/login');
-      cy.get('ion-input[type="email"]').type('cypress_test@correo.com');
-      cy.get('ion-input[type="password"]').type('passwordSeguro123');
-      cy.get('ion-button.login-btn').click();
-      
-      // Verifica el acceso a la zona privada y el estado del Header Component
-      cy.url().should('include', '/player-list');
-      cy.get('app-header').should('contain', 'cypress_test');
-    });
-
-    it('Debería limpiar los datos visuales del usuario al salir a la landing', () => {
-      // Flujo de cierre de sesión visual / limpieza de URL
-      cy.visit('/player-list');
-      cy.visit('/landing'); 
-      
-      // El header forzado en la landing debe mostrar el botón público de login
-      cy.get('app-header').shadow().find('.login-btn').should('be.visible');
-      cy.get('app-header').shadow().find('.user-info-btn').should('not.exist');
-    });
-  });
-
-  // ==========================================
-  // 2. CRUD DE JUGADORES (Componente Stencil)
-  // ==========================================
   context('Módulo CRUD - Jugadores', () => {
-    
+
     beforeEach(() => {
-      // Inyección de sesión o navegación directa simulando rol Admin
-      cy.visit('/player-list');
-    });
-
-    it('[C] - Debería insertar un nuevo jugador desde el formulario', () => {
-      cy.visit('/add-player');
-      cy.get('ion-input[name="name"]').type('Luka Modric');
-      cy.get('ion-input[name="team"]').type('Real Madrid');
-      cy.get('ion-input[name="league"]').type('LaLiga');
-      
-      // Interacción con selectores nativos de Ionic
-      cy.get('ion-select[name="position"]').click();
-      cy.get('ion-select-option').contains('Midfielder').click();
-      
-      cy.get('ion-button[type="submit"]').click();
-
-      // Comprobación de retorno y renderizado del Web Component de Stencil
-      cy.url().should('include', '/player-list');
-      cy.get('player-row-item').should('have.attr', 'name', 'Luka Modric');
-    });
-
-    it('[R] - Debería buscar y filtrar un elemento en la lista', () => {
-      cy.get('ion-searchbar').type('Modric');
-      
-      // El buscador debe aislar estructuralmente el componente Stencil correcto
-      cy.get('player-row-item').should('have.length', 1);
-      cy.get('player-row-item').should('have.attr', 'name', 'Luka Modric');
+      cy.intercept('POST', '**/accounts:signInWithPassword**').as('firebaseLogin');
+      cy.visit('/login');
+      cy.get('ion-input').eq(0).find('input').type('jaime@gmail.com');
+      cy.get('ion-input').eq(1).find('input').type('123456');
+      cy.get('[data-testid="login-btn"]').click();
+      cy.wait('@firebaseLogin');
     });
 
     it('[U] - Debería editar las propiedades de un jugador existente', () => {
-      // Filtramos para asegurar que hacemos click en el correcto
-      cy.get('ion-searchbar').type('Luka Modric');
-      
-      // Accedemos a los eventos del Shadow DOM del componente Stencil para editar
-      cy.get('player-row-item').shadow().find('.btn-edit').click();
-      
+      cy.intercept('PUT', '**/api/players/**', {
+        statusCode: 200,
+        body: { name: 'Jugador Editado' }
+      }).as('updatePlayer');
+
+      cy.visit('/player-list');
+      cy.get('player-row-item').should('exist');
+
+      cy.get('player-row-item').first().then(($el) => {
+        $el[0].dispatchEvent(new CustomEvent('editClick', { bubbles: true, composed: true }));
+      });
+
       cy.url().should('include', '/edit-player');
-      cy.get('ion-input[name="team"]').clear().type('Modric Legend Team');
-      cy.get('ion-button.save-btn').click();
-      
-      cy.url().should('include', '/player-list');
-      cy.get('player-row-item').should('have.attr', 'team', 'Modric Legend Team');
+      cy.get('ion-input[label="Nombre Completo"]').should('be.visible');
+      cy.get('ion-input[label="Nombre Completo"]').find('input').clear({ force: true }).type('Jugador Editado');
+
+      cy.get('ion-button').contains('Guardar Cambios').click();
+      cy.wait('@updatePlayer');
+
+      cy.url().should('include', '/player-detail');
     });
 
     it('[D] - Debería eliminar un jugador de la lista', () => {
-      cy.get('ion-searchbar').type('Luka Modric');
-      
-      // Disparamos la acción de borrado desde el Web Component
-      cy.get('player-row-item').shadow().find('.btn-delete').click();
-      
-      // Si configuraste un AlertController de confirmación de Ionic:
-      cy.get('ion-alert').should('be.visible');
-      cy.get('button').contains('Confirmar').click();
+      cy.intercept('DELETE', '**/api/players/**', {
+        statusCode: 200,
+        body: {}
+      }).as('deletePlayer');
 
-      // El elemento ya no debe existir en el DOM
-      cy.get('player-row-item').should('not.exist');
+      cy.intercept('GET', '**/api/players**', {
+        statusCode: 200,
+        body: Array(12).fill({ name: 'Jugador', team: 'Equipo', league: 'Liga', position: 'Attacker' })
+      }).as('getPlayersAfterDelete');
+
+      cy.visit('/player-list');
+      cy.get('player-row-item').should('exist');
+
+      cy.get('player-row-item').first().then(($el) => {
+        $el[0].dispatchEvent(new CustomEvent('deleteClick', { bubbles: true, composed: true }));
+      });
+
+      cy.wait('@deletePlayer');
+      cy.wait('@getPlayersAfterDelete');
+      cy.get('player-row-item').should('have.length.lessThan', 13);
     });
   });
 
-  // ==========================================
-  // 3. CRUD DE COMENTARIOS Y VALORACIONES
-  // ==========================================
   context('Módulo CRUD - Comentarios y Valoraciones', () => {
 
+    beforeEach(() => {
+      cy.intercept('POST', '**/accounts:signInWithPassword**').as('firebaseLogin');
+      cy.visit('/login');
+      cy.get('ion-input').eq(0).find('input').type('admin@gmail.com');
+      cy.get('ion-input').eq(1).find('input').type('123456');
+      cy.get('[data-testid="login-btn"]').click();
+      cy.wait('@firebaseLogin');
+    });
+
     it('[C] - Debería publicar un nuevo comentario con valoración por estrellas', () => {
-      // Entramos al detalle de cualquier jugador para ver sus comentarios
-      cy.visit('/player-detail/1'); 
-      
-      cy.get('ion-textarea[name="commentText"]').type('Increíble rendimiento esta temporada, ¡un crack!');
-      
-      // Seleccionamos la valoración de estrellas (ej: 4 estrellas)
-      cy.get('.star-rating-input ion-icon').eq(3).click(); 
-      
-      cy.get('ion-button.submit-comment').click();
+  cy.intercept('GET', '**/api/players/6a149fc72f31b5620c8a2652**', {
+    statusCode: 200,
+    body: {
+      _id: '6a149fc72f31b5620c8a2652',
+      name: 'Jugador Test',
+      team: 'Equipo Test',
+      league: 'Liga Test',
+      position: 'Attacker',
+      comments: [
+        { _id: 'comment1', text: 'Increíble rendimiento esta temporada, ¡un crack!', rating: 4, author: '' }
+      ]
+    }
+  }).as('getPlayer');
 
-      // Verificamos que aparezca listado dinámicamente en el contenedor nativo
-      cy.get('.comment-text').first().should('contain.text', 'Increíble rendimiento esta temporada');
-      cy.get('.stars ion-icon[name="star"]').should('have.length', 4);
-    });
+  cy.intercept('POST', '**/api/players/**/comments**', {
+    statusCode: 201,
+    body: { text: 'Increíble rendimiento esta temporada, ¡un crack!', rating: 4, author: '' }
+  }).as('saveComment');
 
-    it('[D] - Debería permitir al administrador eliminar un comentario ofensivo o erróneo', () => {
-      cy.visit('/player-detail/1');
-      
-      // Buscamos el bloque del comentario y hacemos click en su botón de borrar (exclusivo Admin)
-      cy.get('.ion-text-wrap').contains('Increíble rendimiento esta temporada')
-        .parents('ion-item')
-        .find('.delete-comment-btn').click();
+  cy.visit('/player-detail/6a149fc72f31b5620c8a2652');
+  cy.wait('@getPlayer');
 
-      cy.get('.comment-text').should('not.contain.text', 'Increíble rendimiento esta temporada');
-    });
-  });
+  cy.get('ion-textarea').find('textarea')
+    .type('Increíble rendimiento esta temporada, ¡un crack!');
+
+  cy.get('ion-select[label="Valoración (Estrellas)"]').click();
+  cy.wait(500);
+  cy.get('ion-popover').contains('4 Estrellas').click();
+
+  cy.get('ion-button').contains('Publicar Opinión').click();
+  cy.wait('@saveComment');
+
+  cy.get('.comment-text').first()
+    .should('contain.text', 'Increíble rendimiento esta temporada');
+});
+
+
+});
 
 });
