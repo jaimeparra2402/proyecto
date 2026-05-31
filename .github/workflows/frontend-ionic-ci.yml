@@ -38,15 +38,17 @@ jobs:
 
     - name: Build + Run Cypress E2E Tests (Chrome & Electron)
       run: |
-        cd frontend-ionic
-
-        # 1. instalar deps
+        # 1. Compilar la librería list primero
+        cd list
         npm install
+        npm run build      
 
-        # 2. IMPORTANTE: compilar lo que falta (evita error dist/)
+        # 2. Ahora compilar el frontend
+        cd ../frontend-ionic
+        npm install
         npx ng build
 
-        # 3. levantar server + tests
+        # 3. Start server + tests
         npx start-server-and-test \
           "npm start" \
           http://localhost:8100 \
