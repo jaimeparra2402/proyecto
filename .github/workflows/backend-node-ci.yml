@@ -20,8 +20,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     
-    # --- CONEXIÓN A BASE DE DATOS PARA TESTS (RÚBRICA) ---
-    # Levantamos un contenedor temporal de MongoDB dentro del pipeline
     services:
       mongodb:
         image: mongo:6.0
@@ -56,48 +54,48 @@ jobs:
       env:
         MONGO_URI: mongodb://localhost:27017/futbol_db
         NODE_ENV: test
-        JWT_SECRET: tu_clave_secreta_del_env # Clave simétrica para firmar el bypass del test
-        GEMINI_API_KEY: AIzaSyFakeKey_ForTestsOnly # Mock key para que el SDK de Google AI no falle al inicializarse
+        JWT_SECRET: tu_clave_secreta_del_env 
+        GEMINI_API_KEY: AIzaSyFakeKey_ForTestsOnly 
 
     - name: Verify code structure
       run: |
         cd backend-node
         node --check server.js
 
-# deploy-to-gcp:
-#   needs: build-and-test
-#   if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-#   runs-on: ubuntu-latest
-#   permissions:
-#     contents: read
-#     id-token: write
-#   steps:
-#   - name: Checkout code
-#     uses: actions/checkout@v4
-#
-#   - name: Google Auth
-#     uses: google-github-actions/auth@v2
-#     with:
-#       credentials_json: ${{ secrets.GCP_SA_KEY }}
-#
-#   - name: Set up Cloud SDK
-#     uses: google-github-actions/setup-gcloud@v2
-#
-#   - name: Configure Docker for Artifact Registry
-#     run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-#
-#   - name: Build and Push Docker Image to Artifact Registry
-#     run: |
-#       cd backend-node
-#       docker build -t europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA .
-#       docker push europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA
-#
-#   - name: Deploy to Cloud Run
-#     run: |
-#       gcloud run deploy $SERVICE_NAME \
-#         --image europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA \
-#         --platform managed \
-#         --region europe-west1 \
-#         --port 8080 \
-#         --set-env-vars MONGO_URI="mongodb+srv://admin:admin@cluster0.kvkm1vk.mongodb.net/futbol_db?appName=Cluster0",NODE_ENV="production" \
-#         --timeout 300
+   deploy-to-gcp:
+     needs: build-and-test
+     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+     runs-on: ubuntu-latest
+     permissions:
+       contents: read
+       id-token: write
+     steps:
+     - name: Checkout code
+       uses: actions/checkout@v4
+  
+     - name: Google Auth
+       uses: google-github-actions/auth@v2
+       with:
+         credentials_json: ${{ secrets.GCP_SA_KEY }}
+  
+     - name: Set up Cloud SDK
+       uses: google-github-actions/setup-gcloud@v2
+  
+     - name: Configure Docker for Artifact Registry
+       run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+  
+     - name: Build and Push Docker Image to Artifact Registry
+       run: |
+         cd backend-node
+         docker build -t europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA .
+         docker push europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA
+  
+     - name: Deploy to Cloud Run
+       run: |
+         gcloud run deploy $SERVICE_NAME \
+           --image europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA \
+           --platform managed \
+           --region europe-west1 \
+           --port 8080 \
+           --set-env-vars MONGO_URI="mongodb+srv://admin:admin@cluster0.kvkm1vk.mongodb.net/futbol_db?appName=Cluster0",NODE_ENV="production" \
+           --timeout 300

@@ -2,17 +2,12 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const { app } = require('./server'); 
 
-// Clonamos el token bypass que tienes configurado en tu .env para las rutas protegidas
-// (Asegúrate de que JWT_SECRET en tu .env coincida con lo que espera tu authController)
 const BYPASS_TOKEN = process.env.JWT_SECRET || '8f3b20c4e09f5a7d6e8b9c0a1f2e3d4c5b6a7f8e9d0c1b2a3f4e5d6c7b8a9f0e';
 
-describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
+describe(' PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
   let creadoPlayerId;
   let creadoCommentId;
 
-  // =======================================================
-  // 🟢 1. PRUEBAS DE RUTAS PÚBLICAS (Jugadores y Filtros)
-  // =======================================================
   describe('GET /api/players (Público)', () => {
     it('debe listar los jugadores de la BD local', async () => {
       const res = await request(app).get('/api/players');
@@ -29,9 +24,7 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
     });
   });
 
-  // =======================================================
-  // 🔒 2. PRUEBAS DE CREACIÓN Y GEOLOCALIZACIÓN (Protegidas)
-  // =======================================================
+
   describe('POST /api/players (Protegido - Formulario/Manual)', () => {
     it('debe rechazar la creación si no se envía token', async () => {
       const res = await request(app).post('/api/players').send({ name: 'Test' });
@@ -41,7 +34,7 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
     it('debe crear un jugador con geolocalización usando el token de acceso', async () => {
       const res = await request(app)
         .post('/api/players')
-        .set('Authorization', `Bearer ${BYPASS_TOKEN}`) // Pasamos el token en la cabecera
+        .set('Authorization', `Bearer ${BYPASS_TOKEN}`) 
         .send({
           name: 'Jugador Test Unitario',
           team: 'Test FC',
@@ -54,13 +47,11 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
       
       expect(res.statusCode).toBe(201);
       expect(res.body.data.player).toHaveProperty('_id');
-      creadoPlayerId = res.body.data.player._id; // Guardamos el ID para los siguientes tests
+      creadoPlayerId = res.body.data.player._id; 
     });
   });
 
-  // =======================================================
-  // 💬 3. PRUEBAS DE DOCUMENTOS ANIDADOS (Comentarios y GET)
-  // =======================================================
+
   describe('GESTIÓN DE COMENTARIOS (Anidados)', () => {
     it('debe añadir un comentario con estrellas y geolocalización al jugador', async () => {
       const res = await request(app)
@@ -75,7 +66,6 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
 
       expect(res.statusCode).toBe(201);
       expect(res.body.data.player.comments.length).toBeGreaterThan(0);
-      // Guardamos el ID del comentario recién creado para probar el borrado más tarde
       creadoCommentId = res.body.data.player.comments[res.body.data.player.comments.length - 1]._id;
     });
 
@@ -87,15 +77,12 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
     });
   });
 
-  // =======================================================
-  // ✈️ 4. PRUEBAS DE API EXTERNA E INTELIGENCIA ARTIFICIAL
-  // =======================================================
   describe('API EXTERNA E INTELIGENCIA ARTIFICIAL', () => {
     it('GET /api/external/search-player debe conectar con API-Football', async () => {
       const res = await request(app)
         .get('/api/external/search-player?search=Cristiano')
         .set('Authorization', `Bearer ${BYPASS_TOKEN}`);
-      expect([200, 400, 404]).toContain(res.statusCode); // Depende de la API externa en el test
+      expect([200, 400, 404]).toContain(res.statusCode); 
     });
 
 
@@ -103,14 +90,11 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
       const res = await request(app)
         .get('/api/external/equipo-ideal')
         .set('Authorization', `Bearer ${BYPASS_TOKEN}`);
-      // Puede devolver 200 (éxito IA) o 400 (si hay menos de 11 jugadores en la BD)
       expect([200, 400]).toContain(res.statusCode);
     });
   });
 
-  // =======================================================
-  // 👑 5. PRUEBAS DE ROL ADMINISTRADOR (Update y Delete)
-  // =======================================================
+
   describe('OPERACIONES DE ADMINISTRADOR', () => {
     it('debe permitir al Admin actualizar los datos de un jugador', async () => {
       const res = await request(app)
@@ -136,7 +120,6 @@ describe('⚽ PRUEBAS UNITARIAS - API DE FÚTBOL COMPLETA', () => {
   });
 });
 
-// Cerramos la conexión a MongoDB al terminar todas las pruebas para que Jest no se quede colgado
 afterAll(async () => {
   await mongoose.connection.close();
 });

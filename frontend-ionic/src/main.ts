@@ -17,6 +17,8 @@ import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
 import { defineCustomElements as definePwaElements } from '@ionic/pwa-elements/loader';
 import { defineCustomElement as definePlayerRowItem } from './../../list/dist/components/player-row-item.js';
+//import { defineCustomElements } from 'list/loader';
+//defineCustomElements(window);
 
 definePwaElements(window);
 definePlayerRowItem();

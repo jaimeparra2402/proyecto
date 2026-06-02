@@ -114,7 +114,7 @@ describe('AddPlayerPage (Pruebas Unitarias)', () => {
 
   it('no debería guardar al jugador ni llamar al servicio si faltan campos obligatorios', () => {
     spyOn(window, 'alert');
-    component.name = ''; // Campo vacío obligatorio
+    component.name = '';
     component.team = 'Real Madrid';
 
     component.savePlayer();
