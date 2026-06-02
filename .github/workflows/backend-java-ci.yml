@@ -86,6 +86,11 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Build JAR
+        run: |
+          cd JPA/backend-java
+          mvn clean package -DskipTests
+
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 

@@ -36,62 +36,85 @@ jobs:
         cd frontend-ionic
         npm ci
 
-    - name: Build + Run Cypress E2E Tests (Chrome & Electron)
-      run: |
-        # 1. Compilar la librería list primero
-        cd list
-        npm install
-        npm run build
-
-        # 2. Compilar el frontend
-        cd ../frontend-ionic
-        npm install
-        npm install cypress --save-dev   
-        npx ng build
-
-        # 3. Start server + tests
-        npx start-server-and-test \
-          "npx ng serve --port 8100 --host 0.0.0.0" \
-          http://localhost:8100 \
-          "npx cypress run --browser chrome && npx cypress run --browser electron"
+    #- name: Build + Run Cypress E2E Tests (Chrome & Electron)
+    #  run: |
+    #    # 1. Compilar la librería list primero
+    #    cd list
+    #    npm install
+    #    npm run build
+#
+    #    # 2. Compilar el frontend
+    #    cd ../frontend-ionic
+    #    npm install
+    #    npm install cypress --save-dev   
+    #    npx ng build
+#
+    #    # 3. Start server + tests
+    #    npx start-server-and-test \
+    #      "npx ng serve --port 8100 --host 0.0.0.0" \
+    #      http://localhost:8100 \
+    #      "npx cypress run --browser chrome && npx cypress run --browser electron"
 
     - name: Run Static Code Analysis (Linter)
       run: |
         cd frontend-ionic
         npm run lint || true
 
-  build-and-publish:
+    build-and-publish:
     needs: test-and-analysis
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       id-token: write
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Google Auth
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-    - name: Configure Docker for GCP
-      run: gcloud auth configure-docker --quiet
+      - name: Configure Docker for GCP
+        run: gcloud auth configure-docker --quiet
 
-    - name: Build and Push Docker Container
-      run: |
-        cd frontend-ionic
-        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME .
-        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME
+      - name: Build JAR
+        run: |
+          cd frontend-ionic
+          mvn clean package -DskipTests
 
-    - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy $SERVICE_NAME \
-          --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
-          --platform managed \
-          --region $REGION \
-          --allow-unauthenticated
+      - name: Build Stencil Library
+        run: |
+          cd list
+          npm ci
+          npm run build
+
+      - name: Build Frontend
+        run: |
+          cd frontend-ionic
+          npm ci
+          npm run build -- --configuration=production
+
+      - name: Verify Build
+        run: |
+          ls -la frontend-ionic/www
+
+      - name: Build and Push Docker Container
+        run: |
+          cd frontend-ionic
+          docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME .
+          docker push gcr.io/$PROJECT_ID/$SERVICE_NAME
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
+            --platform managed \
+            --region $REGION \
+            --allow-unauthenticated

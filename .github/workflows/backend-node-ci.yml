@@ -85,6 +85,10 @@ jobs:
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+      - name: Build JAR
+        run: |
+          cd backend-node
+          mvn clean package -DskipTests
 
       - name: Build and Push Docker Image to Artifact Registry
         run: |
