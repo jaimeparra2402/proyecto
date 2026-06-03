@@ -10,14 +10,38 @@ on:
     paths:
       - 'backend-node/**'
   workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests (emergency deploy)'
+        required: false
+        default: 'false'
+        type: boolean
+      environment:
+        description: 'Target environment'
+        required: false
+        default: 'production'
+        type: choice
+        options: [production, staging]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PROJECT_ID: cc-25-26
   SERVICE_NAME: backend-node
   REGION: europe-west1
+  ARTIFACT_REGISTRY: europe-west1-docker.pkg.dev
+  IMAGE: europe-west1-docker.pkg.dev/cc-25-26/futbol-repo/backend-node
+  NODE_VERSION: '20'
+
+defaults:
+  run:
+    working-directory: backend-node
 
 jobs:
   build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
 
     services:
@@ -25,51 +49,62 @@ jobs:
         image: mongo:6.0
         ports:
           - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: 'backend-node/package-lock.json'
 
       - name: Install dependencies
-        run: |
-          cd backend-node
-          npm ci
+        run: npm ci
 
-      - name: Run Code Linting (Análisis Estático)
-        run: |
-          cd backend-node
-          npx eslint . --ext .js || true
+      - name: Run ESLint
+        run: npx eslint . --ext .js
+        continue-on-error: true
 
-      - name: Run Unit Tests with Coverage (Métricas de Calidad)
-        run: |
-          cd backend-node
-          npm test -- --coverage || npm test
+      - name: Verify code structure
+        run: node --check server.js
+
+      - name: Run tests with coverage
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
+        run: npm test -- --coverage
         env:
           MONGO_URI: mongodb://localhost:27017/futbol_db
           NODE_ENV: test
-          JWT_SECRET: tu_clave_secreta_del_env
-          GEMINI_API_KEY: AIzaSyFakeKey_ForTestsOnly
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - name: Verify code structure
-        run: |
-          cd backend-node
-          node --check server.js
+      - name: Upload coverage report
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend-node/coverage/
+          retention-days: 7
 
-  deploy-to-gcp:
+  docker-build-push:
+    name: Docker Build & Push
     needs: build-and-test
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
       id-token: write
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.image-tag }}
 
     steps:
       - name: Checkout code
@@ -84,24 +119,123 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-      - name: Build JAR
-        run: |
-          cd backend-node
-          mvn clean package -DskipTests
+        run: gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }} --quiet
 
-      - name: Build and Push Docker Image to Artifact Registry
+      - name: Generate image tag
+        id: meta
         run: |
-          cd backend-node
-          docker build -t europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA .
-          docker push europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-8)
+          echo "image-tag=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --build-arg GIT_SHA="$GITHUB_SHA" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            -t ${{ env.IMAGE }}:${{ steps.meta.outputs.image-tag }} \
+            -t ${{ env.IMAGE }}:latest \
+            backend-node/.
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE }}:${{ steps.meta.outputs.image-tag }}
+          docker push ${{ env.IMAGE }}:latest
+
+  deploy-to-gcp:
+    name: Deploy to Cloud Run
+    needs: docker-build-push
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get current revision
+        id: current-revision
+        run: |
+          REVISION=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format='value(status.latestReadyRevisionName)' 2>/dev/null || echo "")
+          echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Cloud Run
+        id: deploy
         run: |
-          gcloud run deploy $SERVICE_NAME \
-            --image europe-west1-docker.pkg.dev/$PROJECT_ID/futbol-repo/$SERVICE_NAME:$GITHUB_SHA \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE }}:${{ needs.docker-build-push.outputs.image-tag }} \
             --platform managed \
-            --region europe-west1 \
+            --region ${{ env.REGION }} \
             --port 8080 \
-            --set-env-vars MONGO_URI="mongodb+srv://admin:admin@cluster0.kvkm1vk.mongodb.net/futbol_db?appName=Cluster0",NODE_ENV="production" \
-            --timeout 300
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 5 \
+            --concurrency 80 \
+            --timeout 300 \
+            --set-env-vars "\
+              MONGO_URI=${{ secrets.MONGODB_URI }},\
+              NODE_ENV=production,\
+              JWT_SECRET=${{ secrets.JWT_SECRET }},\
+              GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}\
+            " \
+            --format='value(status.url)' | tee /tmp/service-url.txt
+          echo "url=$(cat /tmp/service-url.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        id: health
+        run: |
+          SERVICE_URL="${{ steps.deploy.outputs.url }}"
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health" || echo "000")
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Service is healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Health check failed"
+          exit 1
+
+      - name: Rollback on failure
+        if: failure() && steps.current-revision.outputs.revision != ''
+        run: |
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --to-revisions ${{ steps.current-revision.outputs.revision }}=100
+
+      - name: Print deployed URL
+        if: success()
+        run: echo "Deployed at ${{ steps.deploy.outputs.url }}"
+
+  notify:
+    name: Notify result
+    needs: [build-and-test, docker-build-push, deploy-to-gcp]
+    if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pipeline summary
+        run: |
+          echo "## Pipeline summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Build & Test | ${{ needs.build-and-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build & Push | ${{ needs.docker-build-push.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy to Cloud Run | ${{ needs.deploy-to-gcp.result }} |" >> $GITHUB_STEP_SUMMARY

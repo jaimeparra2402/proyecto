@@ -2,76 +2,147 @@ name: Frontend Ionic CI/CD
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'frontend-ionic/**' 
-  pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'frontend-ionic/**'
-
+      - 'list/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend-ionic/**'
+      - 'list/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: false
+        default: 'production'
+        type: choice
+        options: [production, staging]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PROJECT_ID: cc-25-26
   SERVICE_NAME: frontend-ionic
   REGION: europe-west1
+  ARTIFACT_REGISTRY: europe-west1-docker.pkg.dev
+  IMAGE: europe-west1-docker.pkg.dev/cc-25-26/futbol-repo/frontend-ionic
+  NODE_VERSION: '20'
 
 jobs:
   test-and-analysis:
+    name: Lint & Cypress E2E
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: 'frontend-ionic/package-lock.json'
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend-ionic/package-lock.json'
 
-    - name: Install dependencies
-      run: |
-        cd frontend-ionic
-        npm ci
+      - name: Install list library dependencies
+        working-directory: list
+        run: npm ci
 
-    #- name: Build + Run Cypress E2E Tests (Chrome & Electron)
-    #  run: |
-    #    # 1. Compilar la librería list primero
-    #    cd list
-    #    npm install
-    #    npm run build
-#
-    #    # 2. Compilar el frontend
-    #    cd ../frontend-ionic
-    #    npm install
-    #    npm install cypress --save-dev   
-    #    npx ng build
-#
-    #    # 3. Start server + tests
-    #    npx start-server-and-test \
-    #      "npx ng serve --port 8100 --host 0.0.0.0" \
-    #      http://localhost:8100 \
-    #      "npx cypress run --browser chrome && npx cypress run --browser electron"
+      - name: Build list library
+        working-directory: list
+        run: npm run build
 
-    - name: Run Static Code Analysis (Linter)
-      run: |
-        cd frontend-ionic
-        npm run lint || true
+      - name: Install frontend dependencies
+        working-directory: frontend-ionic
+        run: npm ci
 
-    build-and-publish:
+      - name: Run ESLint
+        working-directory: frontend-ionic
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build frontend for E2E
+        working-directory: frontend-ionic
+        run: npm run build -- --configuration=production
+
+      - name: Run Cypress E2E tests (Chrome)
+        working-directory: frontend-ionic
+        run: |
+          npx start-server-and-test \
+            "npx ng serve --port 8100 --host 0.0.0.0" \
+            http://localhost:8100 \
+            "npx cypress run --browser chrome"
+        continue-on-error: true
+
+      - name: Run Cypress E2E tests (Electron)
+        working-directory: frontend-ionic
+        run: |
+          npx start-server-and-test \
+            "npx ng serve --port 8100 --host 0.0.0.0" \
+            http://localhost:8100 \
+            "npx cypress run --browser electron"
+        continue-on-error: true
+
+      - name: Upload Cypress screenshots on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend-ionic/cypress/screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: frontend-ionic/cypress/videos/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  build-and-publish:
+    name: Docker Build & Push
     needs: test-and-analysis
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
       id-token: write
 
+    outputs:
+      image-tag: ${{ steps.meta.outputs.image-tag }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend-ionic/package-lock.json'
+
+      - name: Build list library
+        working-directory: list
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build frontend
+        working-directory: frontend-ionic
+        run: |
+          npm ci
+          npm run build -- --configuration=production
+
+      - name: Verify build output
+        run: ls -la frontend-ionic/www
 
       - name: Google Auth
         uses: google-github-actions/auth@v2
@@ -81,40 +152,118 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker for GCP
-        run: gcloud auth configure-docker --quiet
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }} --quiet
 
-      - name: Build JAR
+      - name: Generate image tag
+        id: meta
         run: |
-          cd frontend-ionic
-          mvn clean package -DskipTests
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-8)
+          echo "image-tag=$SHORT_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Build Stencil Library
+      - name: Build Docker image
         run: |
-          cd list
-          npm ci
-          npm run build
+          docker build \
+            --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --build-arg GIT_SHA="$GITHUB_SHA" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            -t ${{ env.IMAGE }}:${{ steps.meta.outputs.image-tag }} \
+            -t ${{ env.IMAGE }}:latest \
+            frontend-ionic/.
 
-      - name: Build Frontend
+      - name: Push Docker image
         run: |
-          cd frontend-ionic
-          npm ci
-          npm run build -- --configuration=production
+          docker push ${{ env.IMAGE }}:${{ steps.meta.outputs.image-tag }}
+          docker push ${{ env.IMAGE }}:latest
 
-      - name: Verify Build
-        run: |
-          ls -la frontend-ionic/www
+  deploy-to-gcp:
+    name: Deploy to Cloud Run
+    needs: build-and-publish
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
 
-      - name: Build and Push Docker Container
+    permissions:
+      contents: read
+      id-token: write
+
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get current revision
+        id: current-revision
         run: |
-          cd frontend-ionic
-          docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME .
-          docker push gcr.io/$PROJECT_ID/$SERVICE_NAME
+          REVISION=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format='value(status.latestReadyRevisionName)' 2>/dev/null || echo "")
+          echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Cloud Run
+        id: deploy
         run: |
-          gcloud run deploy $SERVICE_NAME \
-            --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE }}:${{ needs.build-and-publish.outputs.image-tag }} \
             --platform managed \
-            --region $REGION \
-            --allow-unauthenticated
+            --region ${{ env.REGION }} \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 5 \
+            --concurrency 80 \
+            --timeout 300 \
+            --allow-unauthenticated \
+            --format='value(status.url)' | tee /tmp/service-url.txt
+          echo "url=$(cat /tmp/service-url.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        id: health
+        run: |
+          SERVICE_URL="${{ steps.deploy.outputs.url }}"
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL" || echo "000")
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Service is healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Health check failed"
+          exit 1
+
+      - name: Rollback on failure
+        if: failure() && steps.current-revision.outputs.revision != ''
+        run: |
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --to-revisions ${{ steps.current-revision.outputs.revision }}=100
+
+      - name: Print deployed URL
+        if: success()
+        run: echo "Deployed at ${{ steps.deploy.outputs.url }}"
+
+  notify:
+    name: Notify result
+    needs: [test-and-analysis, build-and-publish, deploy-to-gcp]
+    if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pipeline summary
+        run: |
+          echo "## Pipeline summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Cypress E2E | ${{ needs.test-and-analysis.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build & Push | ${{ needs.build-and-publish.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy to Cloud Run | ${{ needs.deploy-to-gcp.result }} |" >> $GITHUB_STEP_SUMMARY
